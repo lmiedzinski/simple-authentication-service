@@ -2,11 +2,7 @@ name: build and test feature
 
 on:
   push:
-  pull_request:
     branches: [ feature/** ]
-    paths:
-    - '**.cs'
-    - '**.csproj'
 
 env:
   DOTNET_VERSION: '7.0.306' # The .NET SDK version to use
