@@ -1,3 +1,3 @@
 namespace SimpleAuthenticationService.Domain.UserAccounts;
 
-public record UserAccountId(Guid value);
+public record UserAccountId(Guid Value);
