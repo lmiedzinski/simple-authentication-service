@@ -13,22 +13,20 @@ public sealed class UserAccount : Entity
     }
 
     public UserAccountId Id { get; private set; }
-    public bool IsLocked { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public string Login { get; private set; }
-    public string PasswordHash { get; private set; }
+    public UserAccountStatus Status { get; private set; }
+    public Login Login { get; private set; }
+    public PasswordHash PasswordHash { get; private set; }
     public RefreshToken? RefreshToken { get; private set; }
     public IReadOnlyList<Claim> Claims => _claims.ToList();
 
     public static UserAccount Create(
-        string login,
-        string passwordHash)
+        Login login,
+        PasswordHash passwordHash)
     {
         var userAccount = new UserAccount
         {
             Id = new UserAccountId(Guid.NewGuid()),
-            IsLocked = false,
-            IsDeleted = false,
+            Status = UserAccountStatus.Active,
             Login = login,
             PasswordHash = passwordHash
         };
@@ -96,24 +94,23 @@ public sealed class UserAccount : Entity
         CheckIfUserAccountUpdatesAllowed();
 
         if (RefreshToken is { IsActive: true }) RefreshToken = RefreshToken with { IsActive = false };
-        IsLocked = true;
+        Status = UserAccountStatus.Locked;
 
         Raise(new UserAccountLockedDomainEvent(Guid.NewGuid(), Id));
     }
 
     public void Unlock()
     {
-        if (IsDeleted) throw new DeletedUserAccountUpdatesNotAllowedException(Id);
+        if (Status is UserAccountStatus.Deleted) throw new DeletedUserAccountUpdatesNotAllowedException(Id);
 
-        if (!IsLocked) return;
+        if (Status is not UserAccountStatus.Locked) return;
 
-        IsLocked = false;
+        Status = UserAccountStatus.Active;
 
         Raise(new UserAccountUnlockedDomainEvent(Guid.NewGuid(), Id));
     }
 
-    // TODO: Continue tests from here
-    public void UpdatePasswordHash(string passwordHash)
+    public void UpdatePasswordHash(PasswordHash passwordHash)
     {
         CheckIfUserAccountUpdatesAllowed();
 
@@ -124,16 +121,24 @@ public sealed class UserAccount : Entity
 
     public void Delete()
     {
-        if (IsDeleted) return;
+        if (Status is UserAccountStatus.Deleted) return;
 
-        IsDeleted = true;
+        Status = UserAccountStatus.Deleted;
 
         Raise(new UserAccountDeletedDomainEvent(Guid.NewGuid(), Id));
     }
 
     private void CheckIfUserAccountUpdatesAllowed()
     {
-        if (IsLocked) throw new LockedUserAccountUpdatesNotAllowedException(Id);
-        if (IsDeleted) throw new DeletedUserAccountUpdatesNotAllowedException(Id);
+        switch (Status)
+        {
+            case UserAccountStatus.Locked:
+                throw new LockedUserAccountUpdatesNotAllowedException(Id);
+            case UserAccountStatus.Deleted:
+                throw new DeletedUserAccountUpdatesNotAllowedException(Id);
+            case UserAccountStatus.Active:
+            default:
+                return;
+        }
     }
 }
