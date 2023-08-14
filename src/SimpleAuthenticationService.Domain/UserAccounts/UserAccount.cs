@@ -1,4 +1,4 @@
-using SimpleAuthenticationService.Domain.Primitives;
+using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts.Events;
 using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 

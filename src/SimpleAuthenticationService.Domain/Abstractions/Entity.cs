@@ -1,4 +1,4 @@
-namespace SimpleAuthenticationService.Domain.Primitives;
+namespace SimpleAuthenticationService.Domain.Abstractions;
 
 public abstract class Entity
 {

@@ -1,4 +1,4 @@
-using SimpleAuthenticationService.Domain.Primitives;
+using SimpleAuthenticationService.Domain.Abstractions;
 
 namespace SimpleAuthenticationService.Domain.UserAccounts.Events;
 
