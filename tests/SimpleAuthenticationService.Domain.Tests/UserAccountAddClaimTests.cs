@@ -16,7 +16,10 @@ public class UserAccountAddClaimTests
         userAccount.Lock();
 
         // Act
-        var exception = Record.Exception(() => { userAccount.AddClaim(string.Empty, default); });
+        var exception = Record.Exception(() =>
+        {
+            userAccount.AddClaim(new Claim(string.Empty, default));
+        });
 
         // Assert
         exception.Should().NotBeNull().And.BeOfType<LockedUserAccountUpdatesNotAllowedException>();
@@ -30,11 +33,33 @@ public class UserAccountAddClaimTests
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
         userAccount.Delete();
         // Act
-        var exception = Record.Exception(() => { userAccount.AddClaim(string.Empty, default); });
+        var exception = Record.Exception(() =>
+        {
+            userAccount.AddClaim(new Claim(string.Empty, default));
+        });
 
         // Assert
         exception.Should().NotBeNull().And.BeOfType<DeletedUserAccountUpdatesNotAllowedException>();
         ((DeletedUserAccountUpdatesNotAllowedException)exception!).UserAccountId.Should().Be(userAccount.Id);
+    }
+    
+    [Fact]
+    public void AddClaim_Throws_ClaimAlreadyExistsException_When_Duplicated_Claim_Is_Added()
+    {
+        // Arrange
+        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        var claim = new Claim(string.Empty, default);
+        userAccount.AddClaim(claim);
+        
+        // Act
+        var exception = Record.Exception(() =>
+        {
+            userAccount.AddClaim(claim);
+        });
+
+        // Assert
+        exception.Should().NotBeNull().And.BeOfType<ClaimAlreadyExistsException>();
+        ((ClaimAlreadyExistsException)exception!).Claim.Should().Be(claim);
     }
 
     [Fact]
@@ -46,14 +71,16 @@ public class UserAccountAddClaimTests
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
 
         // Act
-        var exception = Record.Exception(() => { userAccount.AddClaim(claimType, claimValue); });
+        var exception = Record.Exception(() =>
+        {
+            userAccount.AddClaim(new Claim(claimType, claimValue));
+        });
 
         // Assert
         exception.Should().BeNull();
         var claims = userAccount.Claims;
         claims.Should().NotBeNull().And.HaveCount(1);
         var claim = claims.First();
-        claim.Id.Should().NotBe(Guid.Empty);
         claim.Type.Should().Be(claimType);
         claim.Value.Should().NotBeNull().And.Be(claimValue);
     }
@@ -66,7 +93,10 @@ public class UserAccountAddClaimTests
         userAccount.ClearDomainEvents();
 
         // Act
-        var exception = Record.Exception(() => { userAccount.AddClaim(string.Empty, default); });
+        var exception = Record.Exception(() =>
+        {
+            userAccount.AddClaim(new Claim(string.Empty, default));
+        });
 
         // Assert
         exception.Should().BeNull();
@@ -76,6 +106,6 @@ public class UserAccountAddClaimTests
         domainEvent.Should().BeOfType<ClaimAddedDomainEvent>();
         domainEvent.Id.Should().NotBe(Guid.Empty);
         ((ClaimAddedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
-        ((ClaimAddedDomainEvent)domainEvent).ClaimId.Should().Be(userAccount.Claims.First().Id);
+        ((ClaimAddedDomainEvent)domainEvent).Claim.Should().Be(userAccount.Claims[0]);
     }
 }

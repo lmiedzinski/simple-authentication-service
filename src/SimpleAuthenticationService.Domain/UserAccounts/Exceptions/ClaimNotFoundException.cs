@@ -2,10 +2,11 @@ namespace SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 
 public sealed class ClaimNotFoundException : Exception
 {
-    public ClaimId ClaimId { get; private set; }
-    public ClaimNotFoundException(ClaimId claimId)
-        : base($"Claim with the id {claimId.value} was not found")
+    public Claim Claim { get; private set; }
+    
+    public ClaimNotFoundException(Claim claim)
+        : base($"Claim with the type {claim.Type} and value {claim.Value} was not found")
     {
-        ClaimId = claimId;
+        Claim = claim;
     }
 }

@@ -36,42 +36,26 @@ public sealed class UserAccount : Entity
         return userAccount;
     }
 
-    public void AddClaim(string type, string? value)
+    public void AddClaim(Claim claim)
     {
         CheckIfUserAccountUpdatesAllowed();
 
-        var claim = new Claim(
-            new ClaimId(Guid.NewGuid()),
-            type,
-            value);
+        if (_claims.Contains(claim)) throw new ClaimAlreadyExistsException(claim);
 
         _claims.Add(claim);
 
-        Raise(new ClaimAddedDomainEvent(Guid.NewGuid(), Id, claim.Id));
+        Raise(new ClaimAddedDomainEvent(Guid.NewGuid(), Id, claim));
     }
 
-    public void UpdateClaim(ClaimId claimId, string type, string? value)
+    public void RemoveClaim(Claim claim)
     {
         CheckIfUserAccountUpdatesAllowed();
-
-        var claim = _claims.FirstOrDefault(x => x.Id == claimId);
-        if (claim is null) throw new ClaimNotFoundException(claimId);
-
-        claim.Update(type, value);
-
-        Raise(new ClaimUpdatedDomainEvent(Guid.NewGuid(), Id, claim.Id));
-    }
-
-    public void RemoveClaim(ClaimId claimId)
-    {
-        CheckIfUserAccountUpdatesAllowed();
-
-        var claim = _claims.FirstOrDefault(x => x.Id == claimId);
-        if (claim is null) throw new ClaimNotFoundException(claimId);
+        
+        if (!_claims.Contains(claim)) throw new ClaimNotFoundException(claim);
 
         _claims.Remove(claim);
 
-        Raise(new ClaimRemovedDomainEvent(Guid.NewGuid(), Id, claim.Id));
+        Raise(new ClaimRemovedDomainEvent(Guid.NewGuid(), Id, claim));
     }
 
     public void SetNewRefreshToken(string value)
