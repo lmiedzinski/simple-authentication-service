@@ -1,6 +1,8 @@
+using SimpleAuthenticationService.Domain.Abstractions;
+
 namespace SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 
-public sealed class LockedUserAccountUpdatesNotAllowedException : Exception
+public sealed class LockedUserAccountUpdatesNotAllowedException : DomainException
 {
     public UserAccountId UserAccountId { get; private set; }
     

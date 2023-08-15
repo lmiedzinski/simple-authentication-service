@@ -1,6 +1,8 @@
+using SimpleAuthenticationService.Domain.Abstractions;
+
 namespace SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 
-public sealed class ClaimNotFoundException : Exception
+public sealed class ClaimNotFoundException : DomainException
 {
     public Claim Claim { get; private set; }
     

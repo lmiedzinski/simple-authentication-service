@@ -1,6 +1,8 @@
+using SimpleAuthenticationService.Domain.Abstractions;
+
 namespace SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 
-public sealed class ClaimAlreadyExistsException : Exception
+public sealed class ClaimAlreadyExistsException : DomainException
 {
     public Claim Claim { get; private set; }
     

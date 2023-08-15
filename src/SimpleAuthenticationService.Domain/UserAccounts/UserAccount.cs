@@ -12,10 +12,10 @@ public sealed class UserAccount : Entity
     {
     }
 
-    public UserAccountId Id { get; private set; }
+    public UserAccountId Id { get; private set; } = null!;
     public UserAccountStatus Status { get; private set; }
-    public Login Login { get; private set; }
-    public PasswordHash PasswordHash { get; private set; }
+    public Login Login { get; private set; } = null!;
+    public PasswordHash PasswordHash { get; private set; } = null!;
     public RefreshToken? RefreshToken { get; private set; }
     public IReadOnlyList<Claim> Claims => _claims.ToList();
 

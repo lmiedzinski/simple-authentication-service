@@ -1,6 +1,8 @@
+using SimpleAuthenticationService.Domain.Abstractions;
+
 namespace SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 
-public sealed class DeletedUserAccountUpdatesNotAllowedException : Exception
+public sealed class DeletedUserAccountUpdatesNotAllowedException : DomainException
 {
     public UserAccountId UserAccountId { get; private set; }
     public DeletedUserAccountUpdatesNotAllowedException(UserAccountId id)
