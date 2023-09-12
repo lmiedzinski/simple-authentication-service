@@ -1,5 +1,5 @@
 using MediatR;
 
-namespace SimpleAuthenticationService.Domain.Primitives;
+namespace SimpleAuthenticationService.Domain.Abstractions;
 
 public record DomainEvent(Guid Id) : INotification;
