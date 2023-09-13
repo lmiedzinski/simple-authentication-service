@@ -17,7 +17,7 @@ public class UserAccountSetNewRefreshTokenTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.SetNewRefreshToken(string.Empty);
+            userAccount.SetNewRefreshToken(string.Empty, DateTime.UtcNow);
         });
 
         // Assert
@@ -35,7 +35,7 @@ public class UserAccountSetNewRefreshTokenTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.SetNewRefreshToken(string.Empty);
+            userAccount.SetNewRefreshToken(string.Empty, DateTime.UtcNow);
         });
 
         // Assert
@@ -48,12 +48,13 @@ public class UserAccountSetNewRefreshTokenTests
     {
         // Arrange
         const string refreshTokenValue = "refreshTokenValue";
+        var refreshTokenExpirationDate = DateTime.UtcNow;
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.SetNewRefreshToken(refreshTokenValue);
+            userAccount.SetNewRefreshToken(refreshTokenValue, refreshTokenExpirationDate);
         });
 
         // Assert
@@ -61,5 +62,6 @@ public class UserAccountSetNewRefreshTokenTests
         userAccount.RefreshToken.Should().NotBeNull();
         userAccount.RefreshToken!.IsActive.Should().BeTrue();
         userAccount.RefreshToken!.Value.Should().Be(refreshTokenValue);
+        userAccount.RefreshToken!.ExpirationDate.Should().Be(refreshTokenExpirationDate);
     }
 }

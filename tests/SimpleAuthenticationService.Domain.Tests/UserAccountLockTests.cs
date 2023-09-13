@@ -49,8 +49,9 @@ public class UserAccountLockTests
     {
         // Arrange
         const string refreshTokenValue = "refreshTokenValue";
+        var refreshTokenExpirationDate = DateTime.UtcNow;
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        userAccount.SetNewRefreshToken(refreshTokenValue);
+        userAccount.SetNewRefreshToken(refreshTokenValue, refreshTokenExpirationDate);
 
         // Act
         var exception = Record.Exception(() =>
@@ -63,6 +64,7 @@ public class UserAccountLockTests
         userAccount.RefreshToken.Should().NotBeNull();
         userAccount.RefreshToken!.IsActive.Should().BeFalse();
         userAccount.RefreshToken!.Value.Should().Be(refreshTokenValue);
+        userAccount.RefreshToken!.ExpirationDate.Should().Be(refreshTokenExpirationDate);
     }
     
     [Fact]
