@@ -1,3 +1,3 @@
 namespace SimpleAuthenticationService.Application.UserAccounts.RefreshUserAccountToken;
 
-public record RefreshUserAccountTokenResponse(string AccessToken);
+public sealed record RefreshUserAccountTokenResponse(string AccessToken);

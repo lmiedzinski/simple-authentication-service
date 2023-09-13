@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using SimpleAuthenticationService.Application;
 using SimpleAuthenticationService.Infrastructure;
-using SimpleAuthenticationService.Persistence;
 using SimpleAuthenticationService.WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,8 +14,7 @@ builder.Host.UseSerilog((context, configuration) =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddInfrastructure();
-builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 builder.Services.AddCarter();
