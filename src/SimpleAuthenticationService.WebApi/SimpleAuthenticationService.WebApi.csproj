@@ -30,7 +30,6 @@
       <ProjectReference Include="..\SimpleAuthenticationService.Application\SimpleAuthenticationService.Application.csproj" />
       <ProjectReference Include="..\SimpleAuthenticationService.Domain\SimpleAuthenticationService.Domain.csproj" />
       <ProjectReference Include="..\SimpleAuthenticationService.Infrastructure\SimpleAuthenticationService.Infrastructure.csproj" />
-      <ProjectReference Include="..\SimpleAuthenticationService.Persistence\SimpleAuthenticationService.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

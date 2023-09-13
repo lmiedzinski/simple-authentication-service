@@ -7,7 +7,7 @@ using SimpleAuthenticationService.Domain.UserAccounts;
 
 namespace SimpleAuthenticationService.Application.UserAccounts.RefreshUserAccountToken;
 
-public class RefreshUserAccountTokenCommandHandler
+public sealed class RefreshUserAccountTokenCommandHandler
     : ICommandHandler<RefreshUserAccountTokenCommand, RefreshUserAccountTokenResponse>
 {
     private readonly IUserAccountRepository _userAccountRepository;

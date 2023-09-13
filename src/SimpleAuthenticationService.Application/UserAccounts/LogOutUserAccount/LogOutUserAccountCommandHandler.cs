@@ -6,7 +6,7 @@ using SimpleAuthenticationService.Domain.UserAccounts;
 
 namespace SimpleAuthenticationService.Application.UserAccounts.LogOutUserAccount;
 
-public class LogOutUserAccountCommandHandler : ICommandHandler<LogOutUserAccountCommand>
+public sealed class LogOutUserAccountCommandHandler : ICommandHandler<LogOutUserAccountCommand>
 {
     private readonly ITokenService _tokenService;
     private readonly IUserAccountRepository _userAccountRepository;

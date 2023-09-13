@@ -80,6 +80,6 @@ public class UserAccountRevokeRefreshTokenTests
         userAccount.RefreshToken.Should().NotBeNull();
         userAccount.RefreshToken!.IsActive.Should().BeFalse();
         userAccount.RefreshToken!.Value.Should().Be(refreshTokenValue);
-        userAccount.RefreshToken!.ExpirationDate.Should().Be(refreshTokenExpirationDate);
+        userAccount.RefreshToken!.ExpirationDateUtc.Should().Be(refreshTokenExpirationDate);
     }
 }
