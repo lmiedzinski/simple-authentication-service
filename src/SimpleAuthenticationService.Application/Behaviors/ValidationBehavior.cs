@@ -20,7 +20,11 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        // Validate
+        if (!_validators.Any())
+        {
+            return await next();
+        }
+        
         var context = new ValidationContext<TRequest>(request);
 
         var validationFailures = await Task.WhenAll(
@@ -38,9 +42,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         {
             throw new Exceptions.ValidationException(errors);
         }
-
-        var response = await next();
-
-        return response;
+        
+        return await next();
     }
 }

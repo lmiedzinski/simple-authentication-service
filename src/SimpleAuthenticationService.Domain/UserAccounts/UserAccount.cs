@@ -58,11 +58,11 @@ public sealed class UserAccount : Entity
         Raise(new ClaimRemovedDomainEvent(Guid.NewGuid(), Id, claim));
     }
 
-    public void SetNewRefreshToken(string value)
+    public void SetNewRefreshToken(string value, DateTime expiryDate)
     {
         CheckIfUserAccountUpdatesAllowed();
 
-        RefreshToken = new RefreshToken(value, true);
+        RefreshToken = new RefreshToken(value, true, expiryDate);
     }
 
     public void RevokeRefreshToken()
@@ -108,6 +108,7 @@ public sealed class UserAccount : Entity
         if (Status is UserAccountStatus.Deleted) return;
 
         Status = UserAccountStatus.Deleted;
+        if (RefreshToken is { IsActive: true }) RefreshToken = RefreshToken with { IsActive = false };
 
         Raise(new UserAccountDeletedDomainEvent(Guid.NewGuid(), Id));
     }

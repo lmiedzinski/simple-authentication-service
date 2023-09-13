@@ -12,6 +12,7 @@ public static class DependencyInjection
         {
             config.RegisterServicesFromAssemblyContaining<ApplicationAssembly>();
 
+            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 

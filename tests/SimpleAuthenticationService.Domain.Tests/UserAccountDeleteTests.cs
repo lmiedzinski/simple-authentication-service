@@ -43,6 +43,29 @@ public class UserAccountDeleteTests
     }
     
     [Fact]
+    public void Delete_Sets_RefreshToken_IsActive_False_When_RefreshToken_Is_Not_Null_On_Success()
+    {
+        // Arrange
+        const string refreshTokenValue = "refreshTokenValue";
+        var refreshTokenExpirationDate = DateTime.UtcNow;
+        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        userAccount.SetNewRefreshToken(refreshTokenValue, refreshTokenExpirationDate);
+
+        // Act
+        var exception = Record.Exception(() =>
+        {
+            userAccount.Delete();
+        });
+
+        // Assert
+        exception.Should().BeNull();
+        userAccount.RefreshToken.Should().NotBeNull();
+        userAccount.RefreshToken!.IsActive.Should().BeFalse();
+        userAccount.RefreshToken!.Value.Should().Be(refreshTokenValue);
+        userAccount.RefreshToken!.ExpirationDate.Should().Be(refreshTokenExpirationDate);
+    }
+    
+    [Fact]
     public void Delete_Adds_UserAccountDeletedDomainEvent_On_Success()
     {
         // Arrange
