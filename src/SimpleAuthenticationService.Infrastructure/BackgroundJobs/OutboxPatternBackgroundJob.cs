@@ -2,6 +2,7 @@ using System.Data;
 using Dapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quartz;
 using SimpleAuthenticationService.Application.Abstractions.DateAndTime;
@@ -28,13 +29,13 @@ internal sealed class OutboxPatternBackgroundJob : IJob
         SqlConnectionFactory sqlConnectionFactory,
         IPublisher publisher,
         IDateTimeProvider dateTimeProvider,
-        OutboxPatternOptions outboxOptions,
+        IOptions<OutboxPatternOptions> outboxOptions,
         ILogger<OutboxPatternBackgroundJob> logger)
     {
         _sqlConnectionFactory = sqlConnectionFactory;
         _publisher = publisher;
         _dateTimeProvider = dateTimeProvider;
-        _outboxOptions = outboxOptions;
+        _outboxOptions = outboxOptions.Value;
         _logger = logger;
     }
 
@@ -84,8 +85,8 @@ internal sealed class OutboxPatternBackgroundJob : IJob
         var sql = $"""                
             SELECT id, content
             FROM outbox_messages
-            WHERE processed_on_utc IS NULL
-            ORDER BY occurred_on_utc
+            WHERE processed_at_utc IS NULL
+            ORDER BY created_at_utc
             LIMIT {_outboxOptions.BatchSize}
             FOR UPDATE
             """;
@@ -105,7 +106,7 @@ internal sealed class OutboxPatternBackgroundJob : IJob
     {
         const string sql = @"
             UPDATE outbox_messages
-            SET processed_on_utc = @ProcessedOnUtc,
+            SET processed_at_utc = @ProcessedAtUtc,
                 error = @Error
             WHERE id = @Id";
 
@@ -114,7 +115,7 @@ internal sealed class OutboxPatternBackgroundJob : IJob
             new
             {
                 outboxMessage.Id,
-                ProcessedOnUtc = _dateTimeProvider.UtcNow,
+                ProcessedAtUtc = _dateTimeProvider.UtcNow,
                 Error = exception?.ToString()
             },
             transaction: transaction);

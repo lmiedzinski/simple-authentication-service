@@ -13,27 +13,27 @@ namespace SimpleAuthenticationService.Infrastructure.Token;
 
 internal sealed class TokenService : ITokenService
 {
-    private readonly TokenServiceOptions _tokenServiceOptions;
+    private readonly TokenOptions _tokenOptions;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly RsaSecurityKey _rsaSecurityKey;
+    private readonly RsaKeysProvider _rsaKeysProvider;
 
     public TokenService(
-        IOptions<TokenServiceOptions> tokenServiceOptions,
+        IOptions<TokenOptions> tokenServiceOptions,
         IHttpContextAccessor httpContextAccessor,
         IDateTimeProvider dateTimeProvider,
-        RsaSecurityKey rsaSecurityKey)
+        RsaKeysProvider rsaKeysProvider)
     {
         _httpContextAccessor = httpContextAccessor;
         _dateTimeProvider = dateTimeProvider;
-        _rsaSecurityKey = rsaSecurityKey;
-        _tokenServiceOptions = tokenServiceOptions.Value;
+        _rsaKeysProvider = rsaKeysProvider;
+        _tokenOptions = tokenServiceOptions.Value;
     }
 
     public string GenerateAccessToken(UserAccountId userAccountId, IEnumerable<Claim> claims)
     {
         var signingCredentials = new SigningCredentials(
-            key: _rsaSecurityKey,
+            key: _rsaKeysProvider.RsaPrivateSecurityKey,
             algorithm: SecurityAlgorithms.RsaSha256
         );
         
@@ -49,11 +49,11 @@ internal sealed class TokenService : ITokenService
         var jwtHandler = new JwtSecurityTokenHandler();
 
         var jwt = jwtHandler.CreateJwtSecurityToken(
-            issuer: _tokenServiceOptions.AccessTokenOptions.Issuer,
-            audience: _tokenServiceOptions.AccessTokenOptions.Audience,
+            issuer: _tokenOptions.AccessTokenOptions.Issuer,
+            audience: _tokenOptions.AccessTokenOptions.Audience,
             subject: claimsIdentity,
             notBefore: _dateTimeProvider.UtcNow,
-            expires: _dateTimeProvider.UtcNow.AddSeconds(_tokenServiceOptions.AccessTokenOptions.LifeTimeInSeconds),
+            expires: _dateTimeProvider.UtcNow.AddSeconds(_tokenOptions.AccessTokenOptions.LifeTimeInSeconds),
             issuedAt: _dateTimeProvider.UtcNow,
             signingCredentials: signingCredentials);
 
@@ -62,13 +62,13 @@ internal sealed class TokenService : ITokenService
 
     public string GenerateRefreshToken()
     {
-        var length = _tokenServiceOptions.RefreshTokenOptions.Length;
+        var length = _tokenOptions.RefreshTokenOptions.Length;
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(length));
     }
 
     public int GetRefreshTokenLifetimeInMinutes()
     {
-        return _tokenServiceOptions.RefreshTokenOptions.LifeTimeInMinutes;
+        return _tokenOptions.RefreshTokenOptions.LifeTimeInMinutes;
     }
 
     public UserAccountId GetUserAccountIdFromContext()

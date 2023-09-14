@@ -8,7 +8,7 @@ using SimpleAuthenticationService.Infrastructure.OutboxPattern;
 
 namespace SimpleAuthenticationService.Infrastructure.EntityFramework;
 
-internal sealed class ApplicationDbContext : DbContext, IUnitOfWork
+public sealed class ApplicationDbContext : DbContext, IUnitOfWork
 {
     private static readonly JsonSerializerSettings JsonSerializerSettings = new()
     {

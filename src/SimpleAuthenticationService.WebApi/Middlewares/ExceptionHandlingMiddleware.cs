@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuthenticationService.Application.Exceptions;
+using SimpleAuthenticationService.Domain.Abstractions;
 
 namespace SimpleAuthenticationService.WebApi.Middlewares;
 
@@ -53,10 +54,34 @@ public class ExceptionHandlingMiddleware
         {
             ValidationException validationException => new ExceptionDetails(
                 StatusCodes.Status400BadRequest,
-                "ValidationFailure",
+                "ValidationError",
                 "Validation error",
                 "One or more validation errors has occurred",
                 validationException.Errors),
+            NotFoundException notFoundException => new ExceptionDetails(
+                StatusCodes.Status404NotFound,
+                "NotFound",
+                "Not Found",
+                notFoundException.Message,
+                null),
+            UserAccountNotFoundOrGivenPasswordIsIncorrectException unauthorizedException => new ExceptionDetails(
+                StatusCodes.Status401Unauthorized,
+                "Unauthorized",
+                "Unauthorized",
+                unauthorizedException.Message,
+                null),
+            ConcurrentAccessException concurrentAccessException => new ExceptionDetails(
+                StatusCodes.Status409Conflict,
+                "ConcurrentAccess",
+                "Concurrent Access",
+                concurrentAccessException.Message,
+                null),
+            DomainException domainException => new ExceptionDetails(
+                StatusCodes.Status400BadRequest,
+                "BusinessLogicError",
+                "Business Logic Error",
+                domainException.Message,
+                null),
             _ => new ExceptionDetails(
                 StatusCodes.Status500InternalServerError,
                 "ServerError",

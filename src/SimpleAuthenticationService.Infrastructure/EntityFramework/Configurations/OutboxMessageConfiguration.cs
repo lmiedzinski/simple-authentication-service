@@ -12,6 +12,27 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
 
         builder.HasKey(outboxMessage => outboxMessage.Id);
 
-        builder.Property(outboxMessage => outboxMessage.Content).HasColumnType("json");
+        builder.Property(x => x.Id)
+            .HasColumnName("id")
+            .IsRequired();
+        
+        builder.Property(x => x.CreatedAtUtc)
+            .HasColumnName("created_at_utc")
+            .IsRequired();
+        
+        builder.Property(x => x.Type)
+            .HasColumnName("type")
+            .IsRequired();
+        
+        builder.Property(outboxMessage => outboxMessage.Content)
+            .HasColumnName("content")
+            .HasColumnType("json")
+            .IsRequired();
+
+        builder.Property(x => x.ProcessedAtUtc)
+            .HasColumnName("processed_at_utc");
+        
+        builder.Property(x => x.Error)
+            .HasColumnName("error");
     }
 }

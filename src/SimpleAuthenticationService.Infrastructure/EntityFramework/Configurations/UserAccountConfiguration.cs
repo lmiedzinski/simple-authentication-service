@@ -52,6 +52,7 @@ internal sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAc
                 .HasColumnName("refresh_token_is_active");
         });
 
+        builder.Ignore(x => x.Claims);
         builder.OwnsMany(typeof(Claim), "_claims", claimsBuilder =>
         {
             claimsBuilder.ToTable("user_account_claims");
@@ -72,5 +73,8 @@ internal sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAc
                 .IsRequired()
                 .HasMaxLength(512);
         });
+        
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }
