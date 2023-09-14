@@ -1,6 +1,6 @@
 namespace SimpleAuthenticationService.Infrastructure.Token;
 
-public sealed class TokenServiceOptions
+public sealed class TokenOptions
 {
     public AccessTokenOptions AccessTokenOptions { get; init; } = null!;
     public RefreshTokenOptions RefreshTokenOptions { get; init; } = null!;
@@ -11,6 +11,7 @@ public sealed class AccessTokenOptions
     public string Issuer { get; init; } = null!;
     public string Audience { get; init; } = null!;
     public string PrivateRsaCertificate { get; init; } = null!;
+    public string PublicRsaCertificate { get; init; } = null!;
     public int LifeTimeInSeconds { get; init; }
 }
 

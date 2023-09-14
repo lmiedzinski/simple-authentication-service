@@ -72,5 +72,8 @@ internal sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAc
                 .IsRequired()
                 .HasMaxLength(512);
         });
+        
+        builder.Property<uint>("Version")
+            .IsRowVersion();
     }
 }
