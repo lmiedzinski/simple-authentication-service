@@ -10,18 +10,18 @@ namespace SimpleAuthenticationService.Application.UserAccounts.RefreshUserAccoun
 public sealed class RefreshUserAccountTokenCommandHandler
     : ICommandHandler<RefreshUserAccountTokenCommand, RefreshUserAccountTokenResponse>
 {
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public RefreshUserAccountTokenCommandHandler(
-        IUserAccountRepository userAccountRepository,
+        IUserAccountWriteRepository userAccountWriteRepository,
         IUnitOfWork unitOfWork,
         ITokenService tokenService,
         IDateTimeProvider dateTimeProvider)
     {
-        _userAccountRepository = userAccountRepository;
+        _userAccountWriteRepository = userAccountWriteRepository;
         _unitOfWork = unitOfWork;
         _tokenService = tokenService;
         _dateTimeProvider = dateTimeProvider;
@@ -31,7 +31,7 @@ public sealed class RefreshUserAccountTokenCommandHandler
         RefreshUserAccountTokenCommand request,
         CancellationToken cancellationToken)
     {
-        var userAccount = await _userAccountRepository.GetByActiveRefreshTokenValueAsync(
+        var userAccount = await _userAccountWriteRepository.GetByActiveRefreshTokenValueAsync(
             request.RefreshToken,
             cancellationToken);
         if (userAccount is null) throw new NotFoundException(nameof(RefreshToken));

@@ -5,6 +5,7 @@ using Serilog;
 using SimpleAuthenticationService.Application;
 using SimpleAuthenticationService.Infrastructure;
 using SimpleAuthenticationService.Infrastructure.EntityFramework;
+using SimpleAuthenticationService.WebApi.Extensions.Swagger;
 using SimpleAuthenticationService.WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,7 @@ builder.Host.UseSerilog((context, configuration) =>
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddConfiguredSwagger();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -27,8 +28,7 @@ var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseConfiguredSwagger();
 
 app.MapHealthChecks("/_health", new HealthCheckOptions
 {
@@ -41,6 +41,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.MapControllers();
 
 using var scope = app.Services.CreateScope();
 using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

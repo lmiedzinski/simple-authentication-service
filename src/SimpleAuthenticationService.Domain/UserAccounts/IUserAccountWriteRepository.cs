@@ -1,6 +1,6 @@
 namespace SimpleAuthenticationService.Domain.UserAccounts;
 
-public interface IUserAccountRepository
+public interface IUserAccountWriteRepository
 {
     void Add(UserAccount userAccount);
     

@@ -16,7 +16,7 @@ public class RefreshUserAccountTokenTests
 {
     #region TestsSetup
 
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -24,13 +24,13 @@ public class RefreshUserAccountTokenTests
 
     public RefreshUserAccountTokenTests()
     {
-        _userAccountRepository = Substitute.For<IUserAccountRepository>();
+        _userAccountWriteRepository = Substitute.For<IUserAccountWriteRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _tokenService = Substitute.For<ITokenService>();
         _dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         _commandHandler = new RefreshUserAccountTokenCommandHandler(
-            _userAccountRepository,
+            _userAccountWriteRepository,
             _unitOfWork,
             _tokenService,
             _dateTimeProvider);
@@ -43,7 +43,7 @@ public class RefreshUserAccountTokenTests
     {
         // Arrange
         var command = new RefreshUserAccountTokenCommand("refreshToken");
-        _userAccountRepository.GetByActiveRefreshTokenValueAsync(command.RefreshToken).ReturnsNull();
+        _userAccountWriteRepository.GetByActiveRefreshTokenValueAsync(command.RefreshToken).ReturnsNull();
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -65,7 +65,7 @@ public class RefreshUserAccountTokenTests
         var command = new RefreshUserAccountTokenCommand(refreshToken);
         var userAccount = UserAccount.Create(new Login("login"), new PasswordHash("passwordHash"));
         userAccount.SetNewRefreshToken(refreshToken, DateTime.UtcNow);
-        _userAccountRepository.GetByActiveRefreshTokenValueAsync(refreshToken)
+        _userAccountWriteRepository.GetByActiveRefreshTokenValueAsync(refreshToken)
             .Returns(userAccount);
         _tokenService.GenerateAccessToken(userAccount.Id, Arg.Any<IReadOnlyCollection<Claim>>())
             .Returns(accessToken);
@@ -92,7 +92,7 @@ public class RefreshUserAccountTokenTests
         var command = new RefreshUserAccountTokenCommand(refreshToken);
         var userAccount = UserAccount.Create(new Login("login"), new PasswordHash("passwordHash"));
         userAccount.SetNewRefreshToken(refreshToken, DateTime.UtcNow);
-        _userAccountRepository.GetByActiveRefreshTokenValueAsync(refreshToken)
+        _userAccountWriteRepository.GetByActiveRefreshTokenValueAsync(refreshToken)
             .Returns(userAccount);
         _tokenService.GenerateAccessToken(userAccount.Id, Arg.Any<IReadOnlyCollection<Claim>>())
             .Returns("accessToken");

@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace SimpleAuthenticationService.Infrastructure.Token;
 
-internal sealed class RsaKeysProvider
+public class RsaKeysProvider
 {
     public RsaKeysProvider(IOptions<TokenOptions> tokenOptions)
     {
@@ -17,7 +17,7 @@ internal sealed class RsaKeysProvider
 
     private static RsaSecurityKey PreparePrivateKey(string base64Key)
     {
-        using var rsa = RSA.Create();
+        var rsa = RSA.Create();
         rsa.ImportRSAPrivateKey(
             Convert.FromBase64String(base64Key),
             out _);
@@ -26,7 +26,7 @@ internal sealed class RsaKeysProvider
     
     private static RsaSecurityKey PreparePublicKey(string base64Key)
     {
-        using var rsa = RSA.Create();
+        var rsa = RSA.Create();
         rsa.ImportRSAPublicKey(
             Convert.FromBase64String(base64Key),
             out _);

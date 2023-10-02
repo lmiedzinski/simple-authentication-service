@@ -1,3 +1,3 @@
 namespace SimpleAuthenticationService.WebApi.Controllers.UserAccounts.Requests;
 
-public sealed record RefreshTokenRequest(string RefreshToken);
+public sealed record CreateUserAccountRequest(string Login, string Password);
