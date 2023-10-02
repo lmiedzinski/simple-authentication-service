@@ -9,16 +9,16 @@ namespace SimpleAuthenticationService.Application.UserAccounts.LogOutUserAccount
 public sealed class LogOutUserAccountCommandHandler : ICommandHandler<LogOutUserAccountCommand>
 {
     private readonly ITokenService _tokenService;
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public LogOutUserAccountCommandHandler(
         ITokenService tokenService,
-        IUserAccountRepository userAccountRepository,
+        IUserAccountWriteRepository userAccountWriteRepository,
         IUnitOfWork unitOfWork)
     {
         _tokenService = tokenService;
-        _userAccountRepository = userAccountRepository;
+        _userAccountWriteRepository = userAccountWriteRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -26,7 +26,7 @@ public sealed class LogOutUserAccountCommandHandler : ICommandHandler<LogOutUser
     {
         var userAccountId = _tokenService.GetUserAccountIdFromContext();
 
-        var userAccount = await _userAccountRepository.GetByIdAsync(userAccountId, cancellationToken);
+        var userAccount = await _userAccountWriteRepository.GetByIdAsync(userAccountId, cancellationToken);
         if (userAccount is null)
             throw new NotFoundException(nameof(UserAccount), userAccountId.Value.ToString());
         

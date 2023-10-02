@@ -76,5 +76,8 @@ internal sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAc
         
         builder.Property<uint>("Version")
             .IsRowVersion();
+
+        builder.HasIndex(x => x.Login)
+            .IsUnique();
     }
 }

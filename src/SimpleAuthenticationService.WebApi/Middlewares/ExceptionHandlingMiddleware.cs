@@ -76,6 +76,12 @@ public class ExceptionHandlingMiddleware
                 "Concurrent Access",
                 concurrentAccessException.Message,
                 null),
+            LoginAlreadyTakenException loginAlreadyTakenException => new ExceptionDetails(
+                StatusCodes.Status400BadRequest,
+                "LoginAlreadyTaken",
+                "Login Already Taken",
+                loginAlreadyTakenException.Message,
+                null),
             DomainException domainException => new ExceptionDetails(
                 StatusCodes.Status400BadRequest,
                 "BusinessLogicError",

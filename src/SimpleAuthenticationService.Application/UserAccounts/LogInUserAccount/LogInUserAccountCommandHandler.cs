@@ -10,20 +10,20 @@ namespace SimpleAuthenticationService.Application.UserAccounts.LogInUserAccount;
 
 public sealed class LogInUserAccountCommandHandler : ICommandHandler<LogInUserAccountCommand, LogInUserAccountResponse>
 {
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICryptographyService _cryptographyService;
     private readonly ITokenService _tokenService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public LogInUserAccountCommandHandler(
-        IUserAccountRepository userAccountRepository,
+        IUserAccountWriteRepository userAccountWriteRepository,
         IUnitOfWork unitOfWork,
         ICryptographyService cryptographyService,
         ITokenService tokenService,
         IDateTimeProvider dateTimeProvider)
     {
-        _userAccountRepository = userAccountRepository;
+        _userAccountWriteRepository = userAccountWriteRepository;
         _unitOfWork = unitOfWork;
         _cryptographyService = cryptographyService;
         _tokenService = tokenService;
@@ -33,12 +33,11 @@ public sealed class LogInUserAccountCommandHandler : ICommandHandler<LogInUserAc
 
     public async Task<LogInUserAccountResponse> Handle(LogInUserAccountCommand request, CancellationToken cancellationToken)
     {
-        var userAccount = await _userAccountRepository.GetByLoginAsync(new Login(request.Login), cancellationToken);
+        var userAccount = await _userAccountWriteRepository.GetByLoginAsync(new Login(request.Login), cancellationToken);
         if (userAccount is null)
             throw new UserAccountNotFoundOrGivenPasswordIsIncorrectException(request.Login);
 
-        var passwordHash = _cryptographyService.HashPassword(request.Password);
-        if (!userAccount.PasswordHash.Value.Equals(passwordHash))
+        if (!_cryptographyService.IsPasswordMatchingHash(request.Password, userAccount.PasswordHash.Value))
             throw new UserAccountNotFoundOrGivenPasswordIsIncorrectException(request.Login);
         
         userAccount.SetNewRefreshToken(

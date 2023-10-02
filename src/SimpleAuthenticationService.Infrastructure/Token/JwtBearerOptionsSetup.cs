@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace SimpleAuthenticationService.Infrastructure.Token;
 
-internal sealed class JwtBearerOptionsSetup : IConfigureOptions<JwtBearerOptions>
+public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
 {
     private readonly TokenOptions _tokenOptions;
     private readonly RsaKeysProvider _rsaKeysProvider;
@@ -17,8 +17,10 @@ internal sealed class JwtBearerOptionsSetup : IConfigureOptions<JwtBearerOptions
         _rsaKeysProvider = rsaKeysProvider;
     }
 
-    public void Configure(JwtBearerOptions options)
+    public void Configure(string? name, JwtBearerOptions options)
     {
+        // options.Audience = _tokenOptions.AccessTokenOptions.Audience;
+        options.IncludeErrorDetails = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -32,5 +34,10 @@ internal sealed class JwtBearerOptionsSetup : IConfigureOptions<JwtBearerOptions
             IssuerSigningKey = _rsaKeysProvider.RsaPublicSecurityKey,
             ClockSkew = TimeSpan.FromSeconds(5)
         };
+    }
+
+    public void Configure(JwtBearerOptions options)
+    {
+        Configure(JwtBearerDefaults.AuthenticationScheme, options);
     }
 }

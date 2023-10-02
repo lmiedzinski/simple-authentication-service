@@ -4,12 +4,12 @@ using SimpleAuthenticationService.Domain.UserAccounts;
 
 namespace SimpleAuthenticationService.Infrastructure.EntityFramework.Repositories;
 
-internal sealed class UserAccountRepository : IUserAccountRepository
+internal sealed class UserAccountWriteRepository : IUserAccountWriteRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public UserAccountRepository(
+    public UserAccountWriteRepository(
         ApplicationDbContext dbContext,
         IDateTimeProvider dateTimeProvider)
     {

@@ -17,7 +17,7 @@ public class LogInUserAccountTests
 {
     #region TestsSetup
 
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICryptographyService _cryptographyService;
     private readonly ITokenService _tokenService;
@@ -26,14 +26,14 @@ public class LogInUserAccountTests
 
     public LogInUserAccountTests()
     {
-        _userAccountRepository = Substitute.For<IUserAccountRepository>();
+        _userAccountWriteRepository = Substitute.For<IUserAccountWriteRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _cryptographyService = Substitute.For<ICryptographyService>();
         _tokenService = Substitute.For<ITokenService>();
         _dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         _commandHandler = new LogInUserAccountCommandHandler(
-            _userAccountRepository,
+            _userAccountWriteRepository,
             _unitOfWork,
             _cryptographyService,
             _tokenService,
@@ -47,7 +47,7 @@ public class LogInUserAccountTests
     {
         // Arrange
         var command = new LogInUserAccountCommand("login", "password");
-        _userAccountRepository.GetByLoginAsync(new Login(command.Login)).ReturnsNull();
+        _userAccountWriteRepository.GetByLoginAsync(new Login(command.Login)).ReturnsNull();
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -66,9 +66,9 @@ public class LogInUserAccountTests
         // Arrange
         const string passwordHash = "passwordHash";
         var command = new LogInUserAccountCommand("login", "password");
-        _userAccountRepository.GetByLoginAsync(new Login(command.Login))
+        _userAccountWriteRepository.GetByLoginAsync(new Login(command.Login))
             .Returns(UserAccount.Create(new Login(command.Login), new PasswordHash(passwordHash)));
-        _cryptographyService.HashPassword(command.Password).Returns("wrongPasswordHash");
+        _cryptographyService.IsPasswordMatchingHash(command.Password, passwordHash).Returns(false);
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -92,9 +92,9 @@ public class LogInUserAccountTests
         var dateTimeNow = DateTime.UtcNow;
         var command = new LogInUserAccountCommand("login", "password");
         var userAccount = UserAccount.Create(new Login(command.Login), new PasswordHash(passwordHash));
-        _userAccountRepository.GetByLoginAsync(new Login(command.Login))
+        _userAccountWriteRepository.GetByLoginAsync(new Login(command.Login))
             .Returns(userAccount);
-        _cryptographyService.HashPassword(command.Password).Returns(passwordHash);
+        _cryptographyService.IsPasswordMatchingHash(command.Password, passwordHash).Returns(true);
         _tokenService.GenerateRefreshToken().Returns(refreshToken);
         _tokenService.GetRefreshTokenLifetimeInMinutes().Returns(refreshTokenLifespanInMinutes);
         _tokenService.GenerateAccessToken(userAccount.Id, Arg.Any<IReadOnlyCollection<Claim>>()).Returns(accessToken);
@@ -125,9 +125,9 @@ public class LogInUserAccountTests
         var dateTimeNow = DateTime.UtcNow;
         var command = new LogInUserAccountCommand("login", "password");
         var userAccount = UserAccount.Create(new Login(command.Login), new PasswordHash(passwordHash));
-        _userAccountRepository.GetByLoginAsync(new Login(command.Login))
+        _userAccountWriteRepository.GetByLoginAsync(new Login(command.Login))
             .Returns(userAccount);
-        _cryptographyService.HashPassword(command.Password).Returns(passwordHash);
+        _cryptographyService.IsPasswordMatchingHash(command.Password, passwordHash).Returns(true);
         _tokenService.GenerateRefreshToken().Returns(refreshToken);
         _tokenService.GetRefreshTokenLifetimeInMinutes().Returns(refreshTokenLifespanInMinutes);
         _tokenService.GenerateAccessToken(userAccount.Id, Arg.Any<IReadOnlyCollection<Claim>>()).Returns(accessToken);

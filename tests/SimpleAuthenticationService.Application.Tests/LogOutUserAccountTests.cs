@@ -15,20 +15,20 @@ public class LogOutUserAccountTests
 {
     #region TestsSetup
 
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenService _tokenService;
     private readonly ICommandHandler<LogOutUserAccountCommand> _commandHandler;
 
     public LogOutUserAccountTests()
     {
-        _userAccountRepository = Substitute.For<IUserAccountRepository>();
+        _userAccountWriteRepository = Substitute.For<IUserAccountWriteRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _tokenService = Substitute.For<ITokenService>();
 
         _commandHandler = new LogOutUserAccountCommandHandler(
             _tokenService,
-            _userAccountRepository,
+            _userAccountWriteRepository,
             _unitOfWork);
     }
 
@@ -41,7 +41,7 @@ public class LogOutUserAccountTests
         var command = new LogOutUserAccountCommand();
         var userAccountId = new UserAccountId(Guid.NewGuid());
         _tokenService.GetUserAccountIdFromContext().Returns(userAccountId);
-        _userAccountRepository.GetByIdAsync(userAccountId).ReturnsNull();
+        _userAccountWriteRepository.GetByIdAsync(userAccountId).ReturnsNull();
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -61,7 +61,7 @@ public class LogOutUserAccountTests
         var command = new LogOutUserAccountCommand();
         var userAccountId = new UserAccountId(Guid.NewGuid());
         _tokenService.GetUserAccountIdFromContext().Returns(userAccountId);
-        _userAccountRepository.GetByIdAsync(userAccountId)
+        _userAccountWriteRepository.GetByIdAsync(userAccountId)
             .Returns(UserAccount.Create(new Login("login"), new PasswordHash("passwordHash")));
         
         // Act
