@@ -9,6 +9,7 @@ using SimpleAuthenticationService.Application.Abstractions.Token;
 using SimpleAuthenticationService.Application.Abstractions.UserAccounts;
 using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
+using SimpleAuthenticationService.Infrastructure.Authorization;
 using SimpleAuthenticationService.Infrastructure.Cryptography;
 using SimpleAuthenticationService.Infrastructure.DateAndTime;
 using SimpleAuthenticationService.Infrastructure.EntityFramework;
@@ -33,7 +34,9 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseNpgsql(connectionString);
+            options
+                .UseNpgsql(connectionString)
+                .EnableSensitiveDataLogging();
         });
         
         services.AddSingleton(_ => new SqlConnectionFactory(connectionString));
@@ -54,5 +57,12 @@ public static class DependencyInjection
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();
         services.ConfigureOptions<JwtBearerOptionsSetup>();
+        
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(
+                AuthorizationPolicies.UserAccountAdministrator,
+                policy => policy.RequireClaim(AuthorizationPolicies.UserAccountAdministrator));
+        });
     }   
 }

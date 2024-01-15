@@ -47,7 +47,7 @@ internal sealed class UserAccountWriteRepository : IUserAccountWriteRepository
             .FirstOrDefaultAsync(
                 x => x.RefreshToken != null
                      && x.RefreshToken.IsActive
-                     && x.RefreshToken.ExpirationDateUtc < _dateTimeProvider.UtcNow
+                     && x.RefreshToken.ExpirationDateUtc > _dateTimeProvider.UtcNow
                      && x.RefreshToken.Value == refreshTokenValue,
                 cancellationToken: cancellationToken);
     }
