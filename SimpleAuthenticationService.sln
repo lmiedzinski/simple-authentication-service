@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.WebApi", "src\SimpleAuthenticationService.WebApi\SimpleAuthenticationService.WebApi.csproj", "{2212F0B5-1733-49BB-8E64-8DE279E48F6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.Api", "src\SimpleAuthenticationService.Api\SimpleAuthenticationService.Api.csproj", "{2212F0B5-1733-49BB-8E64-8DE279E48F6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.Application", "src\SimpleAuthenticationService.Application\SimpleAuthenticationService.Application.csproj", "{5DCA61FE-2D60-45E2-A37B-1FDA2C1833FA}"
 EndProject

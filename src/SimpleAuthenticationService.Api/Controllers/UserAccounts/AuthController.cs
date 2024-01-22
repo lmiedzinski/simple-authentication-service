@@ -1,12 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SimpleAuthenticationService.Api.Controllers.UserAccounts.Requests;
 using SimpleAuthenticationService.Application.UserAccounts.LogInUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.LogOutUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.RefreshUserAccountToken;
-using SimpleAuthenticationService.WebApi.Controllers.UserAccounts.Requests;
 
-namespace SimpleAuthenticationService.WebApi.Controllers.UserAccounts;
+namespace SimpleAuthenticationService.Api.Controllers.UserAccounts;
 
 [ApiController]
 [Route("api/auth")]

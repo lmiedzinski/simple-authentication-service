@@ -5,8 +5,8 @@ using Serilog;
 using SimpleAuthenticationService.Application;
 using SimpleAuthenticationService.Infrastructure;
 using SimpleAuthenticationService.Infrastructure.EntityFramework;
-using SimpleAuthenticationService.WebApi.Extensions.Swagger;
-using SimpleAuthenticationService.WebApi.Middlewares;
+using SimpleAuthenticationService.Api.Extensions.Swagger;
+using SimpleAuthenticationService.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 

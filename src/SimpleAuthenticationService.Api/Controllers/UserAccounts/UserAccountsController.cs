@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SimpleAuthenticationService.Api.Controllers.UserAccounts.Requests;
 using SimpleAuthenticationService.Application.UserAccounts.AddUserAccountClaim;
 using SimpleAuthenticationService.Application.UserAccounts.CreateUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
 using SimpleAuthenticationService.Infrastructure.Authorization;
-using SimpleAuthenticationService.WebApi.Controllers.UserAccounts.Requests;
 
-namespace SimpleAuthenticationService.WebApi.Controllers.UserAccounts;
+namespace SimpleAuthenticationService.Api.Controllers.UserAccounts;
 
 [ApiController]
 [Route("api/users")]

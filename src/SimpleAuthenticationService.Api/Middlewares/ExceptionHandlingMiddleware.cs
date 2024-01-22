@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleAuthenticationService.Application.Exceptions;
 using SimpleAuthenticationService.Domain.Abstractions;
 
-namespace SimpleAuthenticationService.WebApi.Middlewares;
+namespace SimpleAuthenticationService.Api.Middlewares;
 
 public class ExceptionHandlingMiddleware
 {
