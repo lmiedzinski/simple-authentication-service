@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace SimpleAuthenticationService.Api.Extensions.Swagger;
+namespace SimpleAuthenticationService.Infrastructure.Swagger;
 
 internal sealed class SwaggerAuthorizationHeaderFilter : IOperationFilter
 {

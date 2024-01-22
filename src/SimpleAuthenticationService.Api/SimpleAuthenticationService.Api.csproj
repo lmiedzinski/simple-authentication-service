@@ -8,18 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-        <PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
@@ -27,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SimpleAuthenticationService.Application\SimpleAuthenticationService.Application.csproj" />
-      <ProjectReference Include="..\SimpleAuthenticationService.Domain\SimpleAuthenticationService.Domain.csproj" />
       <ProjectReference Include="..\SimpleAuthenticationService.Infrastructure\SimpleAuthenticationService.Infrastructure.csproj" />
     </ItemGroup>
 

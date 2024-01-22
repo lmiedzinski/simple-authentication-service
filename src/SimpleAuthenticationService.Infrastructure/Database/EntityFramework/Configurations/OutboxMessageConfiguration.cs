@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleAuthenticationService.Infrastructure.OutboxPattern;
 
-namespace SimpleAuthenticationService.Infrastructure.EntityFramework.Configurations;
+namespace SimpleAuthenticationService.Infrastructure.Database.EntityFramework.Configurations;
 
 internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage>
 {

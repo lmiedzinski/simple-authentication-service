@@ -6,7 +6,7 @@ using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using SimpleAuthenticationService.Infrastructure.OutboxPattern;
 
-namespace SimpleAuthenticationService.Infrastructure.EntityFramework;
+namespace SimpleAuthenticationService.Infrastructure.Database.EntityFramework;
 
 public sealed class ApplicationDbContext : DbContext, IUnitOfWork
 {

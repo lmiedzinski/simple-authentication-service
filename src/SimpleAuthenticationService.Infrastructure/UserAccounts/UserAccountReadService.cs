@@ -1,7 +1,7 @@
 using Dapper;
 using SimpleAuthenticationService.Application.Abstractions.UserAccounts;
 using SimpleAuthenticationService.Domain.UserAccounts;
-using SimpleAuthenticationService.Infrastructure.SqlConnection;
+using SimpleAuthenticationService.Infrastructure.Database.SqlConnection;
 
 namespace SimpleAuthenticationService.Infrastructure.UserAccounts;
 

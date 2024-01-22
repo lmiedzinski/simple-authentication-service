@@ -1,8 +1,10 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace SimpleAuthenticationService.Api.Extensions.Swagger;
+namespace SimpleAuthenticationService.Infrastructure.Swagger;
 
 internal static class Swagger
 {

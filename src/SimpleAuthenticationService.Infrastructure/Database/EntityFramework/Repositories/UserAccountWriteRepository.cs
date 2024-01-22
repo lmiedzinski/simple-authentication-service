@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleAuthenticationService.Application.Abstractions.DateAndTime;
 using SimpleAuthenticationService.Domain.UserAccounts;
 
-namespace SimpleAuthenticationService.Infrastructure.EntityFramework.Repositories;
+namespace SimpleAuthenticationService.Infrastructure.Database.EntityFramework.Repositories;
 
 internal sealed class UserAccountWriteRepository : IUserAccountWriteRepository
 {

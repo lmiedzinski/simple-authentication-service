@@ -1,7 +1,7 @@
 using System.Data;
 using Npgsql;
 
-namespace SimpleAuthenticationService.Infrastructure.SqlConnection;
+namespace SimpleAuthenticationService.Infrastructure.Database.SqlConnection;
 
 internal sealed class SqlConnectionFactory
 {

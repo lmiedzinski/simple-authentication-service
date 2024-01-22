@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using SimpleAuthenticationService.Infrastructure.Database.EntityFramework;
 using SimpleAuthenticationService.Infrastructure.EntityFramework;
 
 #nullable disable

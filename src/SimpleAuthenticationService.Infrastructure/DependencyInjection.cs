@@ -1,23 +1,22 @@
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
+using Serilog;
 using SimpleAuthenticationService.Application.Abstractions.Cryptography;
 using SimpleAuthenticationService.Application.Abstractions.DateAndTime;
 using SimpleAuthenticationService.Application.Abstractions.Token;
-using SimpleAuthenticationService.Application.Abstractions.UserAccounts;
-using SimpleAuthenticationService.Domain.Abstractions;
-using SimpleAuthenticationService.Domain.UserAccounts;
 using SimpleAuthenticationService.Infrastructure.Authorization;
 using SimpleAuthenticationService.Infrastructure.Cryptography;
+using SimpleAuthenticationService.Infrastructure.Database;
 using SimpleAuthenticationService.Infrastructure.DateAndTime;
-using SimpleAuthenticationService.Infrastructure.EntityFramework;
-using SimpleAuthenticationService.Infrastructure.EntityFramework.Repositories;
+using SimpleAuthenticationService.Infrastructure.Middlewares;
 using SimpleAuthenticationService.Infrastructure.OutboxPattern;
-using SimpleAuthenticationService.Infrastructure.SqlConnection;
+using SimpleAuthenticationService.Infrastructure.Swagger;
 using SimpleAuthenticationService.Infrastructure.Token;
-using SimpleAuthenticationService.Infrastructure.UserAccounts;
 
 namespace SimpleAuthenticationService.Infrastructure;
 
@@ -25,34 +24,21 @@ public static class DependencyInjection
 {
     public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddDatabase(configuration);
+        
         services.Configure<TokenOptions>(configuration.GetSection("TokenOptions"));
         services.Configure<OutboxPatternOptions>(configuration.GetSection("OutboxPatternOptions"));
-
-        var connectionString =
-            configuration.GetConnectionString("SimpleAuthenticationServiceDatabase") ??
-            throw new ArgumentNullException(nameof(configuration));
-
-        services.AddDbContext<ApplicationDbContext>(options =>
-        {
-            options
-                .UseNpgsql(connectionString)
-                .EnableSensitiveDataLogging();
-        });
-        
-        services.AddSingleton(_ => new SqlConnectionFactory(connectionString));
 
         services.AddSingleton<RsaKeysProvider>();
 
         services.AddScoped<ICryptographyService, CryptographyService>();
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IUserAccountReadService, UserAccountReadService>();
-        services.AddScoped<IUserAccountWriteRepository, UserAccountWriteRepository>();
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
         
         services.AddQuartz();
         services.ConfigureOptions<QuartzOptionsSetup>();
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+        
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();
@@ -64,5 +50,33 @@ public static class DependencyInjection
                 AuthorizationPolicies.UserAccountAdministrator,
                 policy => policy.RequireClaim(AuthorizationPolicies.UserAccountAdministrator));
         });
-    }   
+        
+        services.AddEndpointsApiExplorer();
+        services.AddConfiguredSwagger();
+        
+        services.AddHttpContextAccessor();
+        services.AddHealthChecks();
+        
+        services.AddControllers();
+    }
+
+    public static void UseInfrastructure(this WebApplication app)
+    {
+        app.UseSerilogRequestLogging();
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
+        
+        app.UseConfiguredSwagger();
+        
+        app.MapHealthChecks("/_health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+        
+        app.MapControllers();
+    }
 }

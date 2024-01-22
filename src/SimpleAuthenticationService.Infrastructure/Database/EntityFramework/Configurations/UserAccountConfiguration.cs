@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleAuthenticationService.Domain.UserAccounts;
 
-namespace SimpleAuthenticationService.Infrastructure.EntityFramework.Configurations;
+namespace SimpleAuthenticationService.Infrastructure.Database.EntityFramework.Configurations;
 
 internal sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAccount>
 {
