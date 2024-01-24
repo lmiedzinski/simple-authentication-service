@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleAuthenticationService.Api.Controllers.UserAccounts.Requests;
 using SimpleAuthenticationService.Application.UserAccounts.AddUserAccountClaim;
 using SimpleAuthenticationService.Application.UserAccounts.CreateUserAccount;
+using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
 using SimpleAuthenticationService.Infrastructure.Authorization;
@@ -19,6 +20,18 @@ public class UserAccountsController : ControllerBase
     public UserAccountsController(ISender sender)
     {
         _sender = sender;
+    }
+    
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentLoggedInUserAccount(
+        CancellationToken cancellationToken)
+    {
+        var query = new GetCurrentLoggedInUserAccountQuery();
+
+        var response = await _sender.Send(query, cancellationToken);
+
+        return Ok(response);
     }
     
     [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
