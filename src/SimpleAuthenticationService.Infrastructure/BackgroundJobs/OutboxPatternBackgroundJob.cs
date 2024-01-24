@@ -7,8 +7,8 @@ using Newtonsoft.Json;
 using Quartz;
 using SimpleAuthenticationService.Application.Abstractions.DateAndTime;
 using SimpleAuthenticationService.Domain.Abstractions;
+using SimpleAuthenticationService.Infrastructure.Database.SqlConnection;
 using SimpleAuthenticationService.Infrastructure.OutboxPattern;
-using SimpleAuthenticationService.Infrastructure.SqlConnection;
 
 namespace SimpleAuthenticationService.Infrastructure.BackgroundJobs;
 

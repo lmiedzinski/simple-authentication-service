@@ -1,7 +1,7 @@
 using Dapper;
 using SimpleAuthenticationService.Application.Abstractions.UserAccounts;
 using SimpleAuthenticationService.Domain.UserAccounts;
-using SimpleAuthenticationService.Infrastructure.SqlConnection;
+using SimpleAuthenticationService.Infrastructure.Database.SqlConnection;
 
 namespace SimpleAuthenticationService.Infrastructure.UserAccounts;
 
@@ -46,8 +46,8 @@ internal sealed class UserAccountReadService : IUserAccountReadService
                              ua.id AS Id,
                              ua.login AS Login,
                              ua.status AS Status,
-                             uac.type AS ClaimType,
-                             uac.value AS ClaimValue
+                             uac.type AS Type,
+                             uac.value AS Value
                            FROM user_accounts ua
                            LEFT JOIN user_account_claims uac ON ua.id = uac.user_account_id
                            WHERE ua.id = @UserAccountId
@@ -74,8 +74,8 @@ internal sealed class UserAccountReadService : IUserAccountReadService
             {
                 UserAccountId = id.Value
             },
-            splitOn: "ClaimType");
+            splitOn: "Type");
         
-        return userAccounts[id.Value];
+            return userAccounts[id.Value];
     }
 }
