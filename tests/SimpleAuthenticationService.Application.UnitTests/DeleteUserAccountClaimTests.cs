@@ -2,32 +2,28 @@ using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using SimpleAuthenticationService.Application.Abstractions.Messaging;
-using SimpleAuthenticationService.Application.Abstractions.Token;
 using SimpleAuthenticationService.Application.Exceptions;
-using SimpleAuthenticationService.Application.UserAccounts.LogOutUserAccount;
+using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
 using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using Xunit;
 
-namespace SimpleAuthenticationService.Application.Tests;
+namespace SimpleAuthenticationService.Application.UnitTests;
 
-public class LogOutUserAccountTests
+public class DeleteUserAccountClaimTests
 {
     #region TestsSetup
 
     private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ITokenService _tokenService;
-    private readonly ICommandHandler<LogOutUserAccountCommand> _commandHandler;
+    private readonly ICommandHandler<RemoveUserAccountClaimCommand> _commandHandler;
 
-    public LogOutUserAccountTests()
+    public DeleteUserAccountClaimTests()
     {
         _userAccountWriteRepository = Substitute.For<IUserAccountWriteRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
-        _tokenService = Substitute.For<ITokenService>();
 
-        _commandHandler = new LogOutUserAccountCommandHandler(
-            _tokenService,
+        _commandHandler = new RemoveUserAccountClaimCommandHandler(
             _userAccountWriteRepository,
             _unitOfWork);
     }
@@ -35,13 +31,11 @@ public class LogOutUserAccountTests
     #endregion
     
     [Fact]
-    public async Task Handle_Throws_NotFoundException_When_UserAccount_Is_Null()
+    public async Task Handle_Throws_NotFoundException_When_UserAccount_Not_Exists()
     {
         // Arrange
-        var command = new LogOutUserAccountCommand();
-        var userAccountId = new UserAccountId(Guid.NewGuid());
-        _tokenService.GetUserAccountIdFromContext().Returns(userAccountId);
-        _userAccountWriteRepository.GetByIdAsync(userAccountId).ReturnsNull();
+        var command = new RemoveUserAccountClaimCommand(Guid.NewGuid(), string.Empty, string.Empty);
+        _userAccountWriteRepository.GetByIdAsync(new UserAccountId(command.UserAccountId)).ReturnsNull();
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>
@@ -51,18 +45,19 @@ public class LogOutUserAccountTests
 
         // Assert
         exception.Should().NotBeNull().And.BeOfType<NotFoundException>();
-        exception!.Message.Should().Contain(nameof(UserAccount)).And.Contain(userAccountId.Value.ToString());
+        exception!.Message.Should().Contain(command.UserAccountId.ToString());
     }
     
     [Fact]
     public async Task Handle_Calls_Once_UnitOfWork_On_Success()
     {
         // Arrange
-        var command = new LogOutUserAccountCommand();
-        var userAccountId = new UserAccountId(Guid.NewGuid());
-        _tokenService.GetUserAccountIdFromContext().Returns(userAccountId);
-        _userAccountWriteRepository.GetByIdAsync(userAccountId)
-            .Returns(UserAccount.Create(new Login("login"), new PasswordHash("passwordHash")));
+        var userAccount = UserAccount.Create(new Login("login"), new PasswordHash("passwordHash"));
+        var claim = new Claim("type", "value");
+        userAccount.AddClaim(claim);
+        var command = new RemoveUserAccountClaimCommand(userAccount.Id.Value, claim.Type, claim.Value);
+        
+        _userAccountWriteRepository.GetByIdAsync(new UserAccountId(command.UserAccountId)).Returns(userAccount);
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>

@@ -1,14 +1,15 @@
 using FluentAssertions;
 using SimpleAuthenticationService.Domain.UserAccounts;
+using SimpleAuthenticationService.Domain.UserAccounts.Events;
 using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 using Xunit;
 
-namespace SimpleAuthenticationService.Domain.Tests;
+namespace SimpleAuthenticationService.Domain.UnitTests;
 
-public class UserAccountRevokeRefreshTokenTests
+public class UserAccountUpdatePasswordHashTests
 {
     [Fact]
-    public void RevokeRefreshToken_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
+    public void UpdatePasswordHash_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
@@ -17,7 +18,7 @@ public class UserAccountRevokeRefreshTokenTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RevokeRefreshToken();
+            userAccount.UpdatePasswordHash(new PasswordHash(string.Empty));
         });
 
         // Assert
@@ -26,7 +27,7 @@ public class UserAccountRevokeRefreshTokenTests
     }
 
     [Fact]
-    public void RevokeRefreshToken_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
+    public void UpdatePasswordHash_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
@@ -35,7 +36,7 @@ public class UserAccountRevokeRefreshTokenTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RevokeRefreshToken();
+            userAccount.UpdatePasswordHash(new PasswordHash(string.Empty));
         });
 
         // Assert
@@ -44,42 +45,44 @@ public class UserAccountRevokeRefreshTokenTests
     }
     
     [Fact]
-    public void RevokeRefreshToken_DoesNothing_When_RefreshToken_Is_Null_On_Success()
+    public void UpdatePasswordHash_Updates_PasswordHash_On_Success()
     {
         // Arrange
+        const string passwordHash = "passwordHash";
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RevokeRefreshToken();
+            userAccount.UpdatePasswordHash(new PasswordHash(passwordHash));
         });
 
         // Assert
         exception.Should().BeNull();
-        userAccount.RefreshToken.Should().BeNull();
+        userAccount.PasswordHash.Should().NotBeNull();
+        userAccount.PasswordHash.Value.Should().Be(passwordHash);
     }
     
     [Fact]
-    public void RevokeRefreshToken_Sets_IsActive_False_When_RefreshToken_Is_Not_Null_On_Success()
+    public void UpdatePasswordHash_Adds_PasswordHashUpdatedDomainEvent_On_Success()
     {
         // Arrange
-        const string refreshTokenValue = "refreshTokenValue";
-        var refreshTokenExpirationDate = DateTime.UtcNow;
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        userAccount.SetNewRefreshToken(refreshTokenValue, refreshTokenExpirationDate);
+        userAccount.ClearDomainEvents();
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RevokeRefreshToken();
+            userAccount.UpdatePasswordHash(new PasswordHash(string.Empty));
         });
 
         // Assert
         exception.Should().BeNull();
-        userAccount.RefreshToken.Should().NotBeNull();
-        userAccount.RefreshToken!.IsActive.Should().BeFalse();
-        userAccount.RefreshToken!.Value.Should().Be(refreshTokenValue);
-        userAccount.RefreshToken!.ExpirationDateUtc.Should().Be(refreshTokenExpirationDate);
+        var domainEvents = userAccount.GetDomainEvents();
+        domainEvents.Should().NotBeNull().And.HaveCount(1);
+        var domainEvent = domainEvents.First();
+        domainEvent.Should().BeOfType<PasswordHashUpdatedDomainEvent>();
+        domainEvent.Id.Should().NotBe(Guid.Empty);
+        ((PasswordHashUpdatedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
     }
 }

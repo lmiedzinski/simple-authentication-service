@@ -9,6 +9,10 @@
     <ItemGroup>
         <ProjectReference Include="..\SimpleAuthenticationService.Application\SimpleAuthenticationService.Application.csproj"/>
     </ItemGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="SimpleAuthenticationService.IntegrationTests" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>

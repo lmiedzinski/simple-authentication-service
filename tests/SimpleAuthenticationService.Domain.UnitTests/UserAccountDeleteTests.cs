@@ -1,33 +1,14 @@
 using FluentAssertions;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using SimpleAuthenticationService.Domain.UserAccounts.Events;
-using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 using Xunit;
 
-namespace SimpleAuthenticationService.Domain.Tests;
+namespace SimpleAuthenticationService.Domain.UnitTests;
 
-public class UserAccountLockTests
+public class UserAccountDeleteTests
 {
     [Fact]
-    public void Lock_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
-    {
-        // Arrange
-        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        userAccount.Lock();
-
-        // Act
-        var exception = Record.Exception(() =>
-        {
-            userAccount.Lock();
-        });
-
-        // Assert
-        exception.Should().NotBeNull().And.BeOfType<LockedUserAccountUpdatesNotAllowedException>();
-        ((LockedUserAccountUpdatesNotAllowedException)exception!).UserAccountId.Should().Be(userAccount.Id);
-    }
-
-    [Fact]
-    public void Lock_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
+    public void Delete_DoesNothing_When_Status_Is_Deleted_On_Success()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
@@ -36,16 +17,33 @@ public class UserAccountLockTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.Lock();
+            userAccount.Delete();
         });
 
         // Assert
-        exception.Should().NotBeNull().And.BeOfType<DeletedUserAccountUpdatesNotAllowedException>();
-        ((DeletedUserAccountUpdatesNotAllowedException)exception!).UserAccountId.Should().Be(userAccount.Id);
+        exception.Should().BeNull();
+        userAccount.Status.Should().Be(UserAccountStatus.Deleted);
     }
     
     [Fact]
-    public void Lock_Sets_RefreshToken_IsActive_False_When_RefreshToken_Is_Not_Null_On_Success()
+    public void Delete_Sets_Status_Deleted_When_Status_Is_Active_On_Success()
+    {
+        // Arrange
+        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+
+        // Act
+        var exception = Record.Exception(() =>
+        {
+            userAccount.Delete();
+        });
+
+        // Assert
+        exception.Should().BeNull();
+        userAccount.Status.Should().Be(UserAccountStatus.Deleted);
+    }
+    
+    [Fact]
+    public void Delete_Sets_RefreshToken_IsActive_False_When_RefreshToken_Is_Not_Null_On_Success()
     {
         // Arrange
         const string refreshTokenValue = "refreshTokenValue";
@@ -56,7 +54,7 @@ public class UserAccountLockTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.Lock();
+            userAccount.Delete();
         });
 
         // Assert
@@ -68,24 +66,7 @@ public class UserAccountLockTests
     }
     
     [Fact]
-    public void Lock_Sets_Status_Locked_On_Success()
-    {
-        // Arrange
-        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-
-        // Act
-        var exception = Record.Exception(() =>
-        {
-            userAccount.Lock();
-        });
-
-        // Assert
-        exception.Should().BeNull();
-        userAccount.Status.Should().Be(UserAccountStatus.Locked);
-    }
-    
-    [Fact]
-    public void Lock_Adds_UserAccountLockedDomainEvent_On_Success()
+    public void Delete_Adds_UserAccountDeletedDomainEvent_On_Success()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
@@ -94,7 +75,7 @@ public class UserAccountLockTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.Lock();
+            userAccount.Delete();
         });
 
         // Assert
@@ -102,8 +83,8 @@ public class UserAccountLockTests
         var domainEvents = userAccount.GetDomainEvents();
         domainEvents.Should().NotBeNull().And.HaveCount(1);
         var domainEvent = domainEvents.First();
-        domainEvent.Should().BeOfType<UserAccountLockedDomainEvent>();
+        domainEvent.Should().BeOfType<UserAccountDeletedDomainEvent>();
         domainEvent.Id.Should().NotBe(Guid.Empty);
-        ((UserAccountLockedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
+        ((UserAccountDeletedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
     }
 }

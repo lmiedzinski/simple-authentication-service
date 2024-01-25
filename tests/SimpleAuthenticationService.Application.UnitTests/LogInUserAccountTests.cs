@@ -11,7 +11,7 @@ using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using Xunit;
 
-namespace SimpleAuthenticationService.Application.Tests;
+namespace SimpleAuthenticationService.Application.UnitTests;
 
 public class LogInUserAccountTests
 {

@@ -4,23 +4,21 @@ using SimpleAuthenticationService.Domain.UserAccounts.Events;
 using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 using Xunit;
 
-namespace SimpleAuthenticationService.Domain.Tests;
+namespace SimpleAuthenticationService.Domain.UnitTests;
 
-public class UserAccountRemoveClaimTests
+public class UserAccountLockTests
 {
     [Fact]
-    public void RemoveClaim_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
+    public void Lock_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        var claim = new Claim(string.Empty, default);
-        userAccount.AddClaim(claim);
         userAccount.Lock();
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RemoveClaim(claim);
+            userAccount.Lock();
         });
 
         // Assert
@@ -29,18 +27,16 @@ public class UserAccountRemoveClaimTests
     }
 
     [Fact]
-    public void RemoveClaim_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
+    public void Lock_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        var claim = new Claim(string.Empty, default);
-        userAccount.AddClaim(claim);
         userAccount.Delete();
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RemoveClaim(claim);
+            userAccount.Lock();
         });
 
         // Assert
@@ -49,58 +45,56 @@ public class UserAccountRemoveClaimTests
     }
     
     [Fact]
-    public void RemoveClaim_Throws_ClaimNotFoundException_When_Given_NotExisting_ClaimId()
+    public void Lock_Sets_RefreshToken_IsActive_False_When_RefreshToken_Is_Not_Null_On_Success()
     {
         // Arrange
+        const string refreshTokenValue = "refreshTokenValue";
+        var refreshTokenExpirationDate = DateTime.UtcNow;
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        var existingClaim = new Claim(string.Empty, default);
-        var notExistingClaim = new Claim("NotExistingType", "NotExistingValue");
-        userAccount.AddClaim(existingClaim);
+        userAccount.SetNewRefreshToken(refreshTokenValue, refreshTokenExpirationDate);
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RemoveClaim(notExistingClaim);
-        });
-
-        // Assert
-        exception.Should().NotBeNull().And.BeOfType<ClaimNotFoundException>();
-        ((ClaimNotFoundException)exception!).Claim.Should().Be(notExistingClaim);
-    }
-    
-    [Fact]
-    public void RemoveClaim_Removes_Claim_On_Success()
-    {
-        // Arrange
-        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        var claim = new Claim(string.Empty, default);
-        userAccount.AddClaim(claim);
-
-        // Act
-        var exception = Record.Exception(() =>
-        {
-            userAccount.RemoveClaim(claim);
+            userAccount.Lock();
         });
 
         // Assert
         exception.Should().BeNull();
-        var claims = userAccount.Claims;
-        claims.Should().NotBeNull().And.BeEmpty();
+        userAccount.RefreshToken.Should().NotBeNull();
+        userAccount.RefreshToken!.IsActive.Should().BeFalse();
+        userAccount.RefreshToken!.Value.Should().Be(refreshTokenValue);
+        userAccount.RefreshToken!.ExpirationDateUtc.Should().Be(refreshTokenExpirationDate);
     }
     
     [Fact]
-    public void RemoveClaim_Adds_ClaimRemovedDomainEvent_On_Success()
+    public void Lock_Sets_Status_Locked_On_Success()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
-        var claim = new Claim(string.Empty, default);
-        userAccount.AddClaim(claim);
+
+        // Act
+        var exception = Record.Exception(() =>
+        {
+            userAccount.Lock();
+        });
+
+        // Assert
+        exception.Should().BeNull();
+        userAccount.Status.Should().Be(UserAccountStatus.Locked);
+    }
+    
+    [Fact]
+    public void Lock_Adds_UserAccountLockedDomainEvent_On_Success()
+    {
+        // Arrange
+        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
         userAccount.ClearDomainEvents();
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.RemoveClaim(claim);
+            userAccount.Lock();
         });
 
         // Assert
@@ -108,9 +102,8 @@ public class UserAccountRemoveClaimTests
         var domainEvents = userAccount.GetDomainEvents();
         domainEvents.Should().NotBeNull().And.HaveCount(1);
         var domainEvent = domainEvents.First();
-        domainEvent.Should().BeOfType<ClaimRemovedDomainEvent>();
+        domainEvent.Should().BeOfType<UserAccountLockedDomainEvent>();
         domainEvent.Id.Should().NotBe(Guid.Empty);
-        ((ClaimRemovedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
-        ((ClaimRemovedDomainEvent)domainEvent).Claim.Should().Be(claim);
+        ((UserAccountLockedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
     }
 }

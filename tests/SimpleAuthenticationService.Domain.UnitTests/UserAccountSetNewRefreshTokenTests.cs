@@ -3,7 +3,7 @@ using SimpleAuthenticationService.Domain.UserAccounts;
 using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 using Xunit;
 
-namespace SimpleAuthenticationService.Domain.Tests;
+namespace SimpleAuthenticationService.Domain.UnitTests;
 
 public class UserAccountSetNewRefreshTokenTests
 {
