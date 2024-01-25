@@ -8,7 +8,7 @@ using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using Xunit;
 
-namespace SimpleAuthenticationService.Application.Tests;
+namespace SimpleAuthenticationService.Application.UnitTests;
 
 public class GetUserAccountClaimTests
 {

@@ -16,3 +16,5 @@ var app = builder.Build();
 app.UseInfrastructure();
 
 app.Run();
+
+public partial class Program;

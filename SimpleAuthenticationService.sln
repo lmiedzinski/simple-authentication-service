@@ -12,9 +12,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{49EBEC70-84C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{24A04426-716F-479F-A5D3-0F1D5F72BC9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.Domain.Tests", "tests\SimpleAuthenticationService.Domain.Tests\SimpleAuthenticationService.Domain.Tests.csproj", "{51311E30-9DBD-4337-8F83-717E2125F683}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.Domain.UnitTests", "tests\SimpleAuthenticationService.Domain.UnitTests\SimpleAuthenticationService.Domain.UnitTests.csproj", "{51311E30-9DBD-4337-8F83-717E2125F683}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.Application.Tests", "tests\SimpleAuthenticationService.Application.Tests\SimpleAuthenticationService.Application.Tests.csproj", "{13AE3BC9-D5B6-411C-9D34-E7CA5C5FB9F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.Application.UnitTests", "tests\SimpleAuthenticationService.Application.UnitTests\SimpleAuthenticationService.Application.UnitTests.csproj", "{13AE3BC9-D5B6-411C-9D34-E7CA5C5FB9F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuthenticationService.IntegrationTests", "tests\SimpleAuthenticationService.IntegrationTests\SimpleAuthenticationService.IntegrationTests.csproj", "{90452CDA-8200-46D6-8479-96864B3C788F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{13AE3BC9-D5B6-411C-9D34-E7CA5C5FB9F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13AE3BC9-D5B6-411C-9D34-E7CA5C5FB9F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13AE3BC9-D5B6-411C-9D34-E7CA5C5FB9F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90452CDA-8200-46D6-8479-96864B3C788F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90452CDA-8200-46D6-8479-96864B3C788F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90452CDA-8200-46D6-8479-96864B3C788F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90452CDA-8200-46D6-8479-96864B3C788F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5DCA61FE-2D60-45E2-A37B-1FDA2C1833FA} = {49EBEC70-84C6-4AC7-AA6B-F407DAAC9F7A}
@@ -54,5 +60,6 @@ Global
 		{2212F0B5-1733-49BB-8E64-8DE279E48F6B} = {49EBEC70-84C6-4AC7-AA6B-F407DAAC9F7A}
 		{51311E30-9DBD-4337-8F83-717E2125F683} = {24A04426-716F-479F-A5D3-0F1D5F72BC9E}
 		{13AE3BC9-D5B6-411C-9D34-E7CA5C5FB9F2} = {24A04426-716F-479F-A5D3-0F1D5F72BC9E}
+		{90452CDA-8200-46D6-8479-96864B3C788F} = {24A04426-716F-479F-A5D3-0F1D5F72BC9E}
 	EndGlobalSection
 EndGlobal

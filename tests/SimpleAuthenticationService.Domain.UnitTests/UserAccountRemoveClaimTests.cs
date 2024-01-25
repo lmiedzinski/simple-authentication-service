@@ -4,21 +4,23 @@ using SimpleAuthenticationService.Domain.UserAccounts.Events;
 using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 using Xunit;
 
-namespace SimpleAuthenticationService.Domain.Tests;
+namespace SimpleAuthenticationService.Domain.UnitTests;
 
-public class UserAccountAddClaimTests
+public class UserAccountRemoveClaimTests
 {
     [Fact]
-    public void AddClaim_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
+    public void RemoveClaim_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        var claim = new Claim(string.Empty, default);
+        userAccount.AddClaim(claim);
         userAccount.Lock();
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.AddClaim(new Claim(string.Empty, default));
+            userAccount.RemoveClaim(claim);
         });
 
         // Assert
@@ -27,15 +29,18 @@ public class UserAccountAddClaimTests
     }
 
     [Fact]
-    public void AddClaim_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
+    public void RemoveClaim_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        var claim = new Claim(string.Empty, default);
+        userAccount.AddClaim(claim);
         userAccount.Delete();
+
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.AddClaim(new Claim(string.Empty, default));
+            userAccount.RemoveClaim(claim);
         });
 
         // Assert
@@ -44,58 +49,58 @@ public class UserAccountAddClaimTests
     }
     
     [Fact]
-    public void AddClaim_Throws_ClaimAlreadyExistsException_When_Duplicated_Claim_Is_Added()
+    public void RemoveClaim_Throws_ClaimNotFoundException_When_Given_NotExisting_ClaimId()
+    {
+        // Arrange
+        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        var existingClaim = new Claim(string.Empty, default);
+        var notExistingClaim = new Claim("NotExistingType", "NotExistingValue");
+        userAccount.AddClaim(existingClaim);
+
+        // Act
+        var exception = Record.Exception(() =>
+        {
+            userAccount.RemoveClaim(notExistingClaim);
+        });
+
+        // Assert
+        exception.Should().NotBeNull().And.BeOfType<ClaimNotFoundException>();
+        ((ClaimNotFoundException)exception!).Claim.Should().Be(notExistingClaim);
+    }
+    
+    [Fact]
+    public void RemoveClaim_Removes_Claim_On_Success()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
         var claim = new Claim(string.Empty, default);
         userAccount.AddClaim(claim);
-        
-        // Act
-        var exception = Record.Exception(() =>
-        {
-            userAccount.AddClaim(claim);
-        });
-
-        // Assert
-        exception.Should().NotBeNull().And.BeOfType<ClaimAlreadyExistsException>();
-        ((ClaimAlreadyExistsException)exception!).Claim.Should().Be(claim);
-    }
-
-    [Fact]
-    public void AddClaim_Adds_Claim_On_Success()
-    {
-        // Arrange
-        const string claimType = "claimType";
-        const string claimValue = "claimValue";
-        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.AddClaim(new Claim(claimType, claimValue));
+            userAccount.RemoveClaim(claim);
         });
 
         // Assert
         exception.Should().BeNull();
         var claims = userAccount.Claims;
-        claims.Should().NotBeNull().And.HaveCount(1);
-        var claim = claims.First();
-        claim.Type.Should().Be(claimType);
-        claim.Value.Should().NotBeNull().And.Be(claimValue);
+        claims.Should().NotBeNull().And.BeEmpty();
     }
-
+    
     [Fact]
-    public void AddClaim_Adds_ClaimAddedDomainEvent_On_Success()
+    public void RemoveClaim_Adds_ClaimRemovedDomainEvent_On_Success()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        var claim = new Claim(string.Empty, default);
+        userAccount.AddClaim(claim);
         userAccount.ClearDomainEvents();
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.AddClaim(new Claim(string.Empty, default));
+            userAccount.RemoveClaim(claim);
         });
 
         // Assert
@@ -103,9 +108,9 @@ public class UserAccountAddClaimTests
         var domainEvents = userAccount.GetDomainEvents();
         domainEvents.Should().NotBeNull().And.HaveCount(1);
         var domainEvent = domainEvents.First();
-        domainEvent.Should().BeOfType<ClaimAddedDomainEvent>();
+        domainEvent.Should().BeOfType<ClaimRemovedDomainEvent>();
         domainEvent.Id.Should().NotBe(Guid.Empty);
-        ((ClaimAddedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
-        ((ClaimAddedDomainEvent)domainEvent).Claim.Should().Be(userAccount.Claims[0]);
+        ((ClaimRemovedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
+        ((ClaimRemovedDomainEvent)domainEvent).Claim.Should().Be(claim);
     }
 }

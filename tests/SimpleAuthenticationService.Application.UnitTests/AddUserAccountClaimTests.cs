@@ -3,27 +3,27 @@ using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using SimpleAuthenticationService.Application.Abstractions.Messaging;
 using SimpleAuthenticationService.Application.Exceptions;
-using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
+using SimpleAuthenticationService.Application.UserAccounts.AddUserAccountClaim;
 using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using Xunit;
 
-namespace SimpleAuthenticationService.Application.Tests;
+namespace SimpleAuthenticationService.Application.UnitTests;
 
-public class DeleteUserAccountClaimTests
+public class AddUserAccountClaimTests
 {
     #region TestsSetup
 
     private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ICommandHandler<RemoveUserAccountClaimCommand> _commandHandler;
+    private readonly ICommandHandler<AddUserAccountClaimCommand> _commandHandler;
 
-    public DeleteUserAccountClaimTests()
+    public AddUserAccountClaimTests()
     {
         _userAccountWriteRepository = Substitute.For<IUserAccountWriteRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
 
-        _commandHandler = new RemoveUserAccountClaimCommandHandler(
+        _commandHandler = new AddUserAccountClaimCommandHandler(
             _userAccountWriteRepository,
             _unitOfWork);
     }
@@ -34,7 +34,7 @@ public class DeleteUserAccountClaimTests
     public async Task Handle_Throws_NotFoundException_When_UserAccount_Not_Exists()
     {
         // Arrange
-        var command = new RemoveUserAccountClaimCommand(Guid.NewGuid(), string.Empty, string.Empty);
+        var command = new AddUserAccountClaimCommand(Guid.NewGuid(), string.Empty, string.Empty);
         _userAccountWriteRepository.GetByIdAsync(new UserAccountId(command.UserAccountId)).ReturnsNull();
         
         // Act
@@ -53,9 +53,7 @@ public class DeleteUserAccountClaimTests
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login("login"), new PasswordHash("passwordHash"));
-        var claim = new Claim("type", "value");
-        userAccount.AddClaim(claim);
-        var command = new RemoveUserAccountClaimCommand(userAccount.Id.Value, claim.Type, claim.Value);
+        var command = new AddUserAccountClaimCommand(userAccount.Id.Value, string.Empty, string.Empty);
         
         _userAccountWriteRepository.GetByIdAsync(new UserAccountId(command.UserAccountId)).Returns(userAccount);
         

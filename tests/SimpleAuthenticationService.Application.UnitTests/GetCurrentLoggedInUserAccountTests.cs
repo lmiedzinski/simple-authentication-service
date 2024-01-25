@@ -9,7 +9,7 @@ using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUse
 using SimpleAuthenticationService.Domain.UserAccounts;
 using Xunit;
 
-namespace SimpleAuthenticationService.Application.Tests;
+namespace SimpleAuthenticationService.Application.UnitTests;
 
 public class GetCurrentLoggedInUserAccountTests
 {

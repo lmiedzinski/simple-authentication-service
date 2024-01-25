@@ -4,12 +4,12 @@ using SimpleAuthenticationService.Domain.UserAccounts.Events;
 using SimpleAuthenticationService.Domain.UserAccounts.Exceptions;
 using Xunit;
 
-namespace SimpleAuthenticationService.Domain.Tests;
+namespace SimpleAuthenticationService.Domain.UnitTests;
 
-public class UserAccountUpdatePasswordHashTests
+public class UserAccountAddClaimTests
 {
     [Fact]
-    public void UpdatePasswordHash_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
+    public void AddClaim_Throws_LockedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Locked()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
@@ -18,7 +18,7 @@ public class UserAccountUpdatePasswordHashTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.UpdatePasswordHash(new PasswordHash(string.Empty));
+            userAccount.AddClaim(new Claim(string.Empty, default));
         });
 
         // Assert
@@ -27,16 +27,15 @@ public class UserAccountUpdatePasswordHashTests
     }
 
     [Fact]
-    public void UpdatePasswordHash_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
+    public void AddClaim_Throws_DeletedUserAccountUpdatesNotAllowedException_When_UserAccount_Is_Deleted()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
         userAccount.Delete();
-
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.UpdatePasswordHash(new PasswordHash(string.Empty));
+            userAccount.AddClaim(new Claim(string.Empty, default));
         });
 
         // Assert
@@ -45,26 +44,49 @@ public class UserAccountUpdatePasswordHashTests
     }
     
     [Fact]
-    public void UpdatePasswordHash_Updates_PasswordHash_On_Success()
+    public void AddClaim_Throws_ClaimAlreadyExistsException_When_Duplicated_Claim_Is_Added()
     {
         // Arrange
-        const string passwordHash = "passwordHash";
+        var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
+        var claim = new Claim(string.Empty, default);
+        userAccount.AddClaim(claim);
+        
+        // Act
+        var exception = Record.Exception(() =>
+        {
+            userAccount.AddClaim(claim);
+        });
+
+        // Assert
+        exception.Should().NotBeNull().And.BeOfType<ClaimAlreadyExistsException>();
+        ((ClaimAlreadyExistsException)exception!).Claim.Should().Be(claim);
+    }
+
+    [Fact]
+    public void AddClaim_Adds_Claim_On_Success()
+    {
+        // Arrange
+        const string claimType = "claimType";
+        const string claimValue = "claimValue";
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
 
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.UpdatePasswordHash(new PasswordHash(passwordHash));
+            userAccount.AddClaim(new Claim(claimType, claimValue));
         });
 
         // Assert
         exception.Should().BeNull();
-        userAccount.PasswordHash.Should().NotBeNull();
-        userAccount.PasswordHash.Value.Should().Be(passwordHash);
+        var claims = userAccount.Claims;
+        claims.Should().NotBeNull().And.HaveCount(1);
+        var claim = claims.First();
+        claim.Type.Should().Be(claimType);
+        claim.Value.Should().NotBeNull().And.Be(claimValue);
     }
-    
+
     [Fact]
-    public void UpdatePasswordHash_Adds_PasswordHashUpdatedDomainEvent_On_Success()
+    public void AddClaim_Adds_ClaimAddedDomainEvent_On_Success()
     {
         // Arrange
         var userAccount = UserAccount.Create(new Login(string.Empty), new PasswordHash(string.Empty));
@@ -73,7 +95,7 @@ public class UserAccountUpdatePasswordHashTests
         // Act
         var exception = Record.Exception(() =>
         {
-            userAccount.UpdatePasswordHash(new PasswordHash(string.Empty));
+            userAccount.AddClaim(new Claim(string.Empty, default));
         });
 
         // Assert
@@ -81,8 +103,9 @@ public class UserAccountUpdatePasswordHashTests
         var domainEvents = userAccount.GetDomainEvents();
         domainEvents.Should().NotBeNull().And.HaveCount(1);
         var domainEvent = domainEvents.First();
-        domainEvent.Should().BeOfType<PasswordHashUpdatedDomainEvent>();
+        domainEvent.Should().BeOfType<ClaimAddedDomainEvent>();
         domainEvent.Id.Should().NotBe(Guid.Empty);
-        ((PasswordHashUpdatedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
+        ((ClaimAddedDomainEvent)domainEvent).UserAccountId.Should().Be(userAccount.Id);
+        ((ClaimAddedDomainEvent)domainEvent).Claim.Should().Be(userAccount.Claims[0]);
     }
 }

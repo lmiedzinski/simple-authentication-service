@@ -44,7 +44,7 @@ public class UserAccountsController : ControllerBase
 
         await _sender.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
@@ -71,7 +71,7 @@ public class UserAccountsController : ControllerBase
 
         await _sender.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
     
     [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
@@ -85,6 +85,6 @@ public class UserAccountsController : ControllerBase
 
         await _sender.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
 }
