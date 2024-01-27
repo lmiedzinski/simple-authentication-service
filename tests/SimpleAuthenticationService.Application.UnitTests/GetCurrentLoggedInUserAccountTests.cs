@@ -40,7 +40,7 @@ public class GetCurrentLoggedInUserAccountTests
         var query = new GetCurrentLoggedInUserAccountQuery();
         var userId = Guid.NewGuid();
         _tokenService.GetUserAccountIdFromContext().Returns(new UserAccountId(userId));
-        _userAccountReadService.GetUserAccountById(new UserAccountId(userId)).ReturnsNull();
+        _userAccountReadService.GetUserAccountByIdAsync(new UserAccountId(userId)).ReturnsNull();
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>

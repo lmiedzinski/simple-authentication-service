@@ -6,6 +6,7 @@ using SimpleAuthenticationService.Application.UserAccounts.AddUserAccountClaim;
 using SimpleAuthenticationService.Application.UserAccounts.CreateUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
+using SimpleAuthenticationService.Application.UserAccounts.GetUserAccounts;
 using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
 using SimpleAuthenticationService.Infrastructure.Authorization;
 
@@ -28,6 +29,18 @@ public class UserAccountsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var query = new GetCurrentLoggedInUserAccountQuery();
+
+        var response = await _sender.Send(query, cancellationToken);
+
+        return Ok(response);
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpGet]
+    public async Task<IActionResult> GetUserAccounts(
+        CancellationToken cancellationToken)
+    {
+        var query = new GetUserAccountsQuery();
 
         var response = await _sender.Send(query, cancellationToken);
 

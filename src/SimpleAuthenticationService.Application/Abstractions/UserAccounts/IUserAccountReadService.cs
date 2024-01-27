@@ -5,5 +5,6 @@ namespace SimpleAuthenticationService.Application.Abstractions.UserAccounts;
 public interface IUserAccountReadService
 {
     Task<bool> ExistsByLoginAsync(Login login);
-    Task<UserAccountReadModelDto?> GetUserAccountById(UserAccountId id);
+    Task<UserAccountReadModelDto?> GetUserAccountByIdAsync(UserAccountId id);
+    Task<IEnumerable<UserAccountReadModelDto>> GetUserAccountsAsync();
 }

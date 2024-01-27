@@ -35,7 +35,7 @@ internal sealed class UserAccountReadService : IUserAccountReadService
         return await connection.ExecuteScalarAsync<bool>(sql, new { Login = login.Value});
     }
 
-    public async Task<UserAccountReadModelDto?> GetUserAccountById(UserAccountId id)
+    public async Task<UserAccountReadModelDto?> GetUserAccountByIdAsync(UserAccountId id)
     {
         using var connection = _sqlConnectionFactory.CreateConnection();
 
@@ -53,7 +53,53 @@ internal sealed class UserAccountReadService : IUserAccountReadService
                            WHERE ua.id = @UserAccountId
                            """;
 
-        var x = await connection.QueryAsync<UserAccountReadModelDto, ClaimReadModelDto, UserAccountReadModelDto>(
+        var x = await connection.QueryAsync<UserAccountReadModelDto, ClaimReadModelDto?, UserAccountReadModelDto>(
+            sql,
+            (userAccount, claim) =>
+            {
+                if (userAccounts.TryGetValue(userAccount.Id, out var existingUserAccount))
+                {
+                    userAccount = existingUserAccount;
+                }
+                else
+                {
+                    userAccounts.Add(userAccount.Id, userAccount);
+                }
+
+                if (claim is not null)
+                {
+                    userAccount.Claims.Add(claim);
+                }
+                
+                return userAccount;
+            },
+            new
+            {
+                UserAccountId = id.Value
+            },
+            splitOn: "Type");
+        
+            return userAccounts[id.Value];
+    }
+    
+    public async Task<IEnumerable<UserAccountReadModelDto>> GetUserAccountsAsync()
+    {
+        using var connection = _sqlConnectionFactory.CreateConnection();
+
+        var userAccounts = new Dictionary<Guid, UserAccountReadModelDto>();
+        
+        const string sql = """
+                           SELECT
+                             ua.id AS Id,
+                             ua.login AS Login,
+                             ua.status AS Status,
+                             uac.type AS Type,
+                             uac.value AS Value
+                           FROM user_accounts ua
+                           LEFT JOIN user_account_claims uac ON ua.id = uac.user_account_id
+                           """;
+
+        var x = await connection.QueryAsync<UserAccountReadModelDto, ClaimReadModelDto?, UserAccountReadModelDto>(
             sql,
             (userAccount, claim) =>
             {
@@ -66,16 +112,15 @@ internal sealed class UserAccountReadService : IUserAccountReadService
                     userAccounts.Add(userAccount.Id, userAccount);
                 }
                 
-                userAccount.Claims.Add(claim);
+                if (claim is not null)
+                {
+                    userAccount.Claims.Add(claim);
+                }
 
                 return userAccount;
             },
-            new
-            {
-                UserAccountId = id.Value
-            },
             splitOn: "Type");
         
-            return userAccounts[id.Value];
+        return userAccounts.Values;
     }
 }

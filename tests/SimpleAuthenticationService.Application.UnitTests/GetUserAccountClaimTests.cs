@@ -34,7 +34,7 @@ public class GetUserAccountClaimTests
     {
         // Arrange
         var query = new GetUserAccountClaimsQuery(Guid.NewGuid());
-        _userAccountReadService.GetUserAccountById(new UserAccountId(query.UserAccountId)).ReturnsNull();
+        _userAccountReadService.GetUserAccountByIdAsync(new UserAccountId(query.UserAccountId)).ReturnsNull();
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>

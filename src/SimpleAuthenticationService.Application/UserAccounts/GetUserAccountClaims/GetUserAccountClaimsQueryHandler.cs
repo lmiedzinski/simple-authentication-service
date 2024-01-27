@@ -17,7 +17,7 @@ public sealed class GetUserAccountClaimsQueryHandler
 
     public async Task<IEnumerable<GetUserAccountClaimsQueryResponse>> Handle(GetUserAccountClaimsQuery request, CancellationToken cancellationToken)
     {
-        var userAccount = await _userAccountReadService.GetUserAccountById(new UserAccountId(request.UserAccountId));
+        var userAccount = await _userAccountReadService.GetUserAccountByIdAsync(new UserAccountId(request.UserAccountId));
         if (userAccount is null) throw new NotFoundException(nameof(UserAccount), request.UserAccountId.ToString());
 
         return userAccount.Claims

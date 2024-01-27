@@ -25,7 +25,7 @@ public sealed class GetCurrentLoggedInUserAccountQueryHandler
         CancellationToken cancellationToken)
     {
         var userAccountId = _tokenService.GetUserAccountIdFromContext();
-        var userAccount = await _userAccountReadService.GetUserAccountById(userAccountId);
+        var userAccount = await _userAccountReadService.GetUserAccountByIdAsync(userAccountId);
         if (userAccount is null) throw new NotFoundException(nameof(UserAccount), userAccountId.Value.ToString());
 
         return new GetCurrentLoggedInUserAccountQueryResponse(
