@@ -341,4 +341,29 @@ public class UserAccountsControllerTests : BaseTest
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
+    
+    [Fact]
+    public async Task UpdateUserAccountPassword_Returns_NoContent_On_Success()
+    {
+        // Arrange
+        const string login = "testlogin";
+        const string password = "testPassword123";
+
+        var testUser = await CreateTestUserAsync(login, password);
+
+        var claims = new Dictionary<string, string>
+        {
+            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+        };
+        var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
+        
+        var request = new UpdateUserAccountPasswordRequest("newTestPassword123");
+        
+        // Act
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminAccessToken);
+        var response = await HttpClient.PutAsJsonAsync($"api/users/{testUser.Id.Value}/password", request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
 }

@@ -13,6 +13,7 @@ using SimpleAuthenticationService.Application.UserAccounts.LockUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
 using SimpleAuthenticationService.Application.UserAccounts.UnlockUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.UpdateCurrentLoggedInUserAccountPassword;
+using SimpleAuthenticationService.Application.UserAccounts.UpdateUserAccountPassword;
 using SimpleAuthenticationService.Infrastructure.Authorization;
 
 namespace SimpleAuthenticationService.Api.Controllers.UserAccounts;
@@ -126,6 +127,20 @@ public class UserAccountsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new UnlockUserAccountCommand(id);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpPut("{id:guid}/password")]
+    public async Task<IActionResult> UpdateUserAccountPassword(
+        Guid id,
+        UpdateUserAccountPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateUserAccountPasswordCommand(id, request.NewPassword);
 
         await _sender.Send(command, cancellationToken);
 
