@@ -6,6 +6,7 @@ using SimpleAuthenticationService.Application.UserAccounts.AddUserAccountClaim;
 using SimpleAuthenticationService.Application.UserAccounts.CreateUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.DeleteUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUserAccount;
+using SimpleAuthenticationService.Application.UserAccounts.GetUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccounts;
 using SimpleAuthenticationService.Application.UserAccounts.LockUserAccount;
@@ -80,44 +81,16 @@ public class UserAccountsController : ControllerBase
     }
     
     [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
-    [HttpGet("{id:guid}/claims")]
-    public async Task<IActionResult> GetUserAccountClaims(
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetUserAccount(
         Guid id,
         CancellationToken cancellationToken)
     {
-        var query = new GetUserAccountClaimsQuery(id);
+        var query = new GetUserAccountQuery(id);
 
         var response = await _sender.Send(query, cancellationToken);
 
         return Ok(response);
-    }
-    
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
-    [HttpPost("{id:guid}/claims")]
-    public async Task<IActionResult> AddUserAccountClaim(
-        Guid id,
-        AddUserAccountClaimRequest request,
-        CancellationToken cancellationToken)
-    {
-        var command = new AddUserAccountClaimCommand(id, request.Type, request.Value);
-
-        await _sender.Send(command, cancellationToken);
-
-        return NoContent();
-    }
-    
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
-    [HttpDelete("{id:guid}/claims")]
-    public async Task<IActionResult> DeleteUserAccountClaim(
-        Guid id,
-        DeleteUserAccountClaimRequest request,
-        CancellationToken cancellationToken)
-    {
-        var command = new RemoveUserAccountClaimCommand(id, request.Type, request.Value);
-
-        await _sender.Send(command, cancellationToken);
-
-        return NoContent();
     }
     
     [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
@@ -153,6 +126,47 @@ public class UserAccountsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new UnlockUserAccountCommand(id);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpGet("{id:guid}/claims")]
+    public async Task<IActionResult> GetUserAccountClaims(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetUserAccountClaimsQuery(id);
+
+        var response = await _sender.Send(query, cancellationToken);
+
+        return Ok(response);
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpPost("{id:guid}/claims")]
+    public async Task<IActionResult> AddUserAccountClaim(
+        Guid id,
+        AddUserAccountClaimRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddUserAccountClaimCommand(id, request.Type, request.Value);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpDelete("{id:guid}/claims")]
+    public async Task<IActionResult> DeleteUserAccountClaim(
+        Guid id,
+        DeleteUserAccountClaimRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RemoveUserAccountClaimCommand(id, request.Type, request.Value);
 
         await _sender.Send(command, cancellationToken);
 

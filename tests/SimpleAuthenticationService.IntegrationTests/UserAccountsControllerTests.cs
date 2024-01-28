@@ -5,6 +5,7 @@ using FluentAssertions;
 using SimpleAuthenticationService.Api.Controllers.UserAccounts.Requests;
 using SimpleAuthenticationService.Application.Abstractions.UserAccounts.UserAccountStatus;
 using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUserAccount;
+using SimpleAuthenticationService.Application.UserAccounts.GetUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccounts;
 using SimpleAuthenticationService.Domain.UserAccounts;
@@ -139,6 +140,42 @@ public class UserAccountsControllerTests : BaseTest
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+    
+    [Fact]
+    public async Task GetUserAccount_Returns_GetUserAccountQueryResponse_On_Success()
+    {
+        // Arrange
+        var testUser = await CreateTestUserAsync(
+            "testUser1",
+            "testPassword1",
+            new Dictionary<string, string>
+            {
+                { "testClaim1", "testClaim1Value" },
+                { "testClaim2", "testClaim2Value" }
+            });
+
+        var claims = new Dictionary<string, string>
+        {
+            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+        };
+        var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
+
+        // Act
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminAccessToken);
+        var response = await HttpClient.GetAsync($"api/users/{testUser.Id.Value}");
+        var getUserAccountsQueryResponse = await response.Content.ReadFromJsonAsync<GetUserAccountQueryResponse>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        getUserAccountsQueryResponse.Should().NotBeNull();
+        getUserAccountsQueryResponse!.Login.Should().Be(testUser.Login.Value);
+        getUserAccountsQueryResponse.Status.Should().Be(testUser.Status.ToApplication());
+        getUserAccountsQueryResponse.Claims.Should().HaveCount(testUser.Claims.Count);
+        foreach (var claim in getUserAccountsQueryResponse.Claims)
+        {
+            claim.Value.Should().Be(testUser.Claims.Single(x => x.Type == claim.Type).Value);
+        }
     }
 
     [Fact]
