@@ -4,26 +4,26 @@ using NSubstitute.ReturnsExtensions;
 using SimpleAuthenticationService.Application.Abstractions.Messaging;
 using SimpleAuthenticationService.Application.Abstractions.UserAccounts;
 using SimpleAuthenticationService.Application.Exceptions;
-using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
+using SimpleAuthenticationService.Application.UserAccounts.GetUserAccount;
 using SimpleAuthenticationService.Domain.UserAccounts;
 using Xunit;
 
 namespace SimpleAuthenticationService.Application.UnitTests;
 
-public class GetUserAccountClaimTests
+public class GetUserAccountTests
 {
     #region TestsSetup
 
     private readonly IUserAccountReadService _userAccountReadService;
     private readonly IQueryHandler<
-        GetUserAccountClaimsQuery,
-        IEnumerable<GetUserAccountClaimsQueryResponse>> _queryHandler;
+        GetUserAccountQuery,
+        GetUserAccountQueryResponse> _queryHandler;
 
-    public GetUserAccountClaimTests()
+    public GetUserAccountTests()
     {
         _userAccountReadService = Substitute.For<IUserAccountReadService>();
 
-        _queryHandler = new GetUserAccountClaimsQueryHandler(
+        _queryHandler = new GetUserAccountQueryHandler(
             _userAccountReadService);
     }
 
@@ -33,7 +33,7 @@ public class GetUserAccountClaimTests
     public async Task Handle_Throws_NotFoundException_When_UserAccount_Not_Exists()
     {
         // Arrange
-        var query = new GetUserAccountClaimsQuery(Guid.NewGuid());
+        var query = new GetUserAccountQuery(Guid.NewGuid());
         _userAccountReadService.GetUserAccountByIdAsync(new UserAccountId(query.UserAccountId)).ReturnsNull();
         
         // Act

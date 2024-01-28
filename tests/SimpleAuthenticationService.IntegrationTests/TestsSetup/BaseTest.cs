@@ -52,6 +52,8 @@ public abstract class BaseTest : IAsyncLifetime
             _tokenService.GenerateRefreshToken(),
             _dateTimeProvider.UtcNow.AddMinutes(_tokenService.GetRefreshTokenLifetimeInMinutes()));
         
+        testUser.ClearDomainEvents();
+        
         await DbContext.UserAccounts.AddAsync(testUser);
         await DbContext.SaveChangesAsync();
         
