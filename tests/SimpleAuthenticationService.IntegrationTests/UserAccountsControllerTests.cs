@@ -93,7 +93,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
 
@@ -130,7 +130,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
 
@@ -157,7 +157,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
 
@@ -194,7 +194,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var adminClaims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), adminClaims);
 
@@ -224,7 +224,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
 
@@ -254,7 +254,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var adminClaims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), adminClaims);
 
@@ -284,7 +284,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
         
@@ -307,7 +307,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
         
@@ -330,7 +330,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
         
@@ -353,7 +353,7 @@ public class UserAccountsControllerTests : BaseTest
 
         var claims = new Dictionary<string, string>
         {
-            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+            { AuthorizationPolicies.InternalAdministrator, "true" }
         };
         var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
         

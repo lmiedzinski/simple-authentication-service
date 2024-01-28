@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleAuthenticationService.Application.Abstractions.DateAndTime;
 using SimpleAuthenticationService.Application.Abstractions.Token;
 using SimpleAuthenticationService.Domain.UserAccounts;
+using SimpleAuthenticationService.Infrastructure.Authorization;
 using Claim = SimpleAuthenticationService.Domain.UserAccounts.Claim;
 
 namespace SimpleAuthenticationService.Infrastructure.Token;
@@ -85,5 +86,10 @@ internal sealed class TokenService : ITokenService
             throw new ApplicationException("UserAccount context is in the wrong format");
 
         return new UserAccountId(userAccountIdGuid);
+    }
+    
+    public Claim GetInternalAdministratorClaim()
+    {
+        return new Claim(AuthorizationPolicies.InternalAdministrator, "true");
     }
 }

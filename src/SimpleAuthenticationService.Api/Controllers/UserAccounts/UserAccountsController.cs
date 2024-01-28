@@ -56,7 +56,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpGet]
     public async Task<IActionResult> GetUserAccounts(
         CancellationToken cancellationToken)
@@ -68,7 +68,7 @@ public class UserAccountsController : ControllerBase
         return Ok(response);
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpPost]
     public async Task<IActionResult> CreateUserAccount(
         CreateUserAccountRequest request,
@@ -81,7 +81,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetUserAccount(
         Guid id,
@@ -94,7 +94,7 @@ public class UserAccountsController : ControllerBase
         return Ok(response);
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteUserAccount(
         Guid id,
@@ -107,7 +107,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpPost("{id:guid}/lock")]
     public async Task<IActionResult> LockUserAccount(
         Guid id,
@@ -120,7 +120,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpPost("{id:guid}/unlock")]
     public async Task<IActionResult> UnlockUserAccount(
         Guid id,
@@ -133,7 +133,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpPut("{id:guid}/password")]
     public async Task<IActionResult> UpdateUserAccountPassword(
         Guid id,
@@ -147,7 +147,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpGet("{id:guid}/claims")]
     public async Task<IActionResult> GetUserAccountClaims(
         Guid id,
@@ -160,7 +160,7 @@ public class UserAccountsController : ControllerBase
         return Ok(response);
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpPost("{id:guid}/claims")]
     public async Task<IActionResult> AddUserAccountClaim(
         Guid id,
@@ -174,7 +174,7 @@ public class UserAccountsController : ControllerBase
         return NoContent();
     }
     
-    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [Authorize(Policy = AuthorizationPolicies.InternalAdministrator)]
     [HttpDelete("{id:guid}/claims")]
     public async Task<IActionResult> DeleteUserAccountClaim(
         Guid id,

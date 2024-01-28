@@ -8,4 +8,5 @@ public interface ITokenService
     string GenerateRefreshToken();
     int GetRefreshTokenLifetimeInMinutes();
     UserAccountId GetUserAccountIdFromContext();
+    Claim GetInternalAdministratorClaim();
 }

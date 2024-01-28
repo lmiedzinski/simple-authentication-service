@@ -47,8 +47,8 @@ public static class DependencyInjection
         services.AddAuthorization(options =>
         {
             options.AddPolicy(
-                AuthorizationPolicies.UserAccountAdministrator,
-                policy => policy.RequireClaim(AuthorizationPolicies.UserAccountAdministrator));
+                AuthorizationPolicies.InternalAdministrator,
+                policy => policy.RequireClaim(AuthorizationPolicies.InternalAdministrator, "true"));
         });
         
         services.AddEndpointsApiExplorer();

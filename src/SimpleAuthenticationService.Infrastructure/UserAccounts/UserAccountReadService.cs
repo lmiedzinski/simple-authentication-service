@@ -1,6 +1,7 @@
 using Dapper;
 using SimpleAuthenticationService.Application.Abstractions.UserAccounts;
 using SimpleAuthenticationService.Domain.UserAccounts;
+using SimpleAuthenticationService.Infrastructure.Authorization;
 using SimpleAuthenticationService.Infrastructure.Database.SqlConnection;
 
 namespace SimpleAuthenticationService.Infrastructure.UserAccounts;
@@ -122,5 +123,25 @@ internal sealed class UserAccountReadService : IUserAccountReadService
             splitOn: "Type");
         
         return userAccounts.Values;
+    }
+    
+    public async Task<int> GetActiveInternalAdministratorsCountAsync()
+    {
+        using var connection = _sqlConnectionFactory.CreateConnection();
+        
+        var sql = $"""
+                        SELECT COUNT(1)
+                        FROM user_accounts
+                        WHERE status = {UserAccountStatus.Active}
+                        AND EXISTS (
+                            SELECT 1
+                            FROM user_account_claims
+                            WHERE user_account_id = user_accounts.id
+                            AND type = {AuthorizationPolicies.InternalAdministrator}
+                            AND value = 'true'
+                        )
+                   """;
+
+        return await connection.ExecuteScalarAsync<int>(sql);
     }
 }
