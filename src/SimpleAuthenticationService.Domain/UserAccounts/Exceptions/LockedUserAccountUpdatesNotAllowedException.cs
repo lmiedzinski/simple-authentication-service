@@ -7,7 +7,7 @@ public sealed class LockedUserAccountUpdatesNotAllowedException : DomainExceptio
     public UserAccountId UserAccountId { get; private set; }
     
     public LockedUserAccountUpdatesNotAllowedException(UserAccountId userAccountId)
-        : base($"User account with the id {userAccountId.Value} is locked and cannot be updated")
+        : base($"User account with the id {userAccountId.Value} is locked")
     {
         UserAccountId = userAccountId;
     }
