@@ -1,5 +1,6 @@
 using SimpleAuthenticationService.Application.Abstractions.Cryptography;
 using SimpleAuthenticationService.Application.Abstractions.Messaging;
+using SimpleAuthenticationService.Application.Abstractions.Token;
 using SimpleAuthenticationService.Application.Exceptions;
 using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
@@ -11,15 +12,18 @@ public sealed class UpdateUserAccountPasswordCommandHandler : ICommandHandler<Up
     private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICryptographyService _cryptographyService;
+    private readonly ITokenService _tokenService;
 
     public UpdateUserAccountPasswordCommandHandler(
         IUserAccountWriteRepository userAccountWriteRepository,
         IUnitOfWork unitOfWork,
-        ICryptographyService cryptographyService)
+        ICryptographyService cryptographyService,
+        ITokenService tokenService)
     {
         _userAccountWriteRepository = userAccountWriteRepository;
         _unitOfWork = unitOfWork;
         _cryptographyService = cryptographyService;
+        _tokenService = tokenService;
     }
 
     public async Task Handle(
@@ -32,6 +36,9 @@ public sealed class UpdateUserAccountPasswordCommandHandler : ICommandHandler<Up
         if (userAccount is null) throw new NotFoundException(
             nameof(UserAccount),
             request.UserAccountId.ToString());
+        
+        var actingUserId = _tokenService.GetUserAccountIdFromContext();
+        if (userAccount.Id == actingUserId) throw new SelfOperationNotAllowedException();
         
         var passwordHash = _cryptographyService.HashPassword(request.NewPassword);
         userAccount.UpdatePasswordHash(new PasswordHash(passwordHash));

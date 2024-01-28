@@ -1,4 +1,5 @@
 using SimpleAuthenticationService.Application.Abstractions.Messaging;
+using SimpleAuthenticationService.Application.Abstractions.Token;
 using SimpleAuthenticationService.Application.Exceptions;
 using SimpleAuthenticationService.Domain.Abstractions;
 using SimpleAuthenticationService.Domain.UserAccounts;
@@ -9,13 +10,16 @@ public sealed class LockUserAccountCommandHandler : ICommandHandler<LockUserAcco
 {
     private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITokenService _tokenService;
 
     public LockUserAccountCommandHandler(
         IUserAccountWriteRepository userAccountWriteRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ITokenService tokenService)
     {
         _userAccountWriteRepository = userAccountWriteRepository;
         _unitOfWork = unitOfWork;
+        _tokenService = tokenService;
     }
 
     public async Task Handle(LockUserAccountCommand request, CancellationToken cancellationToken)
@@ -25,6 +29,9 @@ public sealed class LockUserAccountCommandHandler : ICommandHandler<LockUserAcco
             cancellationToken);
         if (userAccount is null)
             throw new NotFoundException(nameof(UserAccount), request.UserAccountId.ToString());
+
+        var actingUserId = _tokenService.GetUserAccountIdFromContext();
+        if (userAccount.Id == actingUserId) throw new SelfOperationNotAllowedException();
         
         userAccount.Lock();
         

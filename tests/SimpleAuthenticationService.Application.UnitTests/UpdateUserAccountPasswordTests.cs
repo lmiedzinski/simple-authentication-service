@@ -3,6 +3,7 @@ using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using SimpleAuthenticationService.Application.Abstractions.Cryptography;
 using SimpleAuthenticationService.Application.Abstractions.Messaging;
+using SimpleAuthenticationService.Application.Abstractions.Token;
 using SimpleAuthenticationService.Application.Exceptions;
 using SimpleAuthenticationService.Application.UserAccounts.UpdateUserAccountPassword;
 using SimpleAuthenticationService.Domain.Abstractions;
@@ -18,6 +19,7 @@ public class UpdateUserAccountPasswordTests
     private readonly IUserAccountWriteRepository _userAccountWriteRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICryptographyService _cryptographyService;
+    private readonly ITokenService _tokenService;
     private readonly ICommandHandler<UpdateUserAccountPasswordCommand> _commandHandler;
 
     public UpdateUserAccountPasswordTests()
@@ -25,11 +27,13 @@ public class UpdateUserAccountPasswordTests
         _userAccountWriteRepository = Substitute.For<IUserAccountWriteRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _cryptographyService = Substitute.For<ICryptographyService>();
+        _tokenService = Substitute.For<ITokenService>();
 
         _commandHandler = new UpdateUserAccountPasswordCommandHandler(
             _userAccountWriteRepository,
             _unitOfWork,
-            _cryptographyService);
+            _cryptographyService,
+            _tokenService);
     }
 
     #endregion
@@ -53,6 +57,26 @@ public class UpdateUserAccountPasswordTests
     }
     
     [Fact]
+    public async Task Handle_Throws_SelfOperationNotAllowedException_When_UserAccountId_Is_UserAccountIdFromContext()
+    {
+        // Arrange
+        var userAccount = UserAccount.Create(new Login("login"), new PasswordHash("passwordHash"));
+        var command = new UpdateUserAccountPasswordCommand(userAccount.Id.Value, "newPassword123");
+        
+        _userAccountWriteRepository.GetByIdAsync(new UserAccountId(command.UserAccountId)).Returns(userAccount);
+        _tokenService.GetUserAccountIdFromContext().Returns(userAccount.Id);
+        
+        // Act
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            await _commandHandler.Handle(command, CancellationToken.None);
+        });
+
+        // Assert
+        exception.Should().NotBeNull().And.BeOfType<SelfOperationNotAllowedException>();
+    }
+    
+    [Fact]
     public async Task Handle_Calls_Once_UnitOfWork_On_Success()
     {
         // Arrange
@@ -60,6 +84,7 @@ public class UpdateUserAccountPasswordTests
         var command = new UpdateUserAccountPasswordCommand(userAccount.Id.Value, "newPassword123");
         _userAccountWriteRepository.GetByIdAsync(userAccount.Id).Returns(userAccount);
         _cryptographyService.HashPassword(command.NewPassword).Returns("newPasswordHash");
+        _tokenService.GetUserAccountIdFromContext().Returns(new UserAccountId(Guid.Empty));
         
         // Act
         var exception = await Record.ExceptionAsync(async () =>
