@@ -52,6 +52,26 @@ public class UserAccountsControllerTests : BaseTest
             claim.Value.Should().Be(claims[claim.Type]);
         }
     }
+    
+    [Fact]
+    public async Task UpdateCurrentLoggedInUserAccountPassword_Returns_NoContent_On_Success()
+    {
+        // Arrange
+        const string login = "testlogin";
+        const string password = "testPassword123";
+
+        var testUser = await CreateTestUserAsync(login, password);
+        var accessToken = GenerateAccessTokenForUser(testUser.Id.Value);
+        
+        var request = new UpdateCurrentLoggedInUserAccountPasswordRequest(password, "newTestPassword123");
+
+        // Act
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        var response = await HttpClient.PutAsJsonAsync("api/users/me/password", request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
 
     [Fact]
     public async Task GetUserAccounts_Returns_GetUserAccountsQueryResponses_On_Success()

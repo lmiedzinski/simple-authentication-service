@@ -8,6 +8,7 @@ using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUse
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccounts;
 using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
+using SimpleAuthenticationService.Application.UserAccounts.UpdateCurrentLoggedInUserAccountPassword;
 using SimpleAuthenticationService.Infrastructure.Authorization;
 
 namespace SimpleAuthenticationService.Api.Controllers.UserAccounts;
@@ -33,6 +34,21 @@ public class UserAccountsController : ControllerBase
         var response = await _sender.Send(query, cancellationToken);
 
         return Ok(response);
+    }
+    
+    [Authorize]
+    [HttpPut("me/password")]
+    public async Task<IActionResult> UpdateCurrentLoggedInUserAccountPassword(
+        UpdateCurrentLoggedInUserAccountPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateCurrentLoggedInUserAccountPasswordCommand(
+            request.CurrentPassword,
+            request.NewPassword);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
     }
     
     [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
