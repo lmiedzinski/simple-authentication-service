@@ -235,4 +235,73 @@ public class UserAccountsControllerTests : BaseTest
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
+    
+    [Fact]
+    public async Task DeleteUserAccount_Returns_NoContent_On_Success()
+    {
+        // Arrange
+        const string login = "testlogin";
+        const string password = "testPassword123";
+
+        var testUser = await CreateTestUserAsync(login, password);
+
+        var claims = new Dictionary<string, string>
+        {
+            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+        };
+        var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
+        
+        // Act
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminAccessToken);
+        var response = await HttpClient.DeleteAsync($"api/users/{testUser.Id.Value}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+    
+    [Fact]
+    public async Task LockUserAccount_Returns_NoContent_On_Success()
+    {
+        // Arrange
+        const string login = "testlogin";
+        const string password = "testPassword123";
+
+        var testUser = await CreateTestUserAsync(login, password);
+
+        var claims = new Dictionary<string, string>
+        {
+            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+        };
+        var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
+        
+        // Act
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminAccessToken);
+        var response = await HttpClient.PostAsync($"api/users/{testUser.Id.Value}/lock", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+    
+    [Fact]
+    public async Task UnlockUserAccount_Returns_NoContent_On_Success()
+    {
+        // Arrange
+        const string login = "testlogin";
+        const string password = "testPassword123";
+
+        var testUser = await CreateTestUserAsync(login, password);
+
+        var claims = new Dictionary<string, string>
+        {
+            { AuthorizationPolicies.UserAccountAdministrator, string.Empty }
+        };
+        var adminAccessToken = GenerateAccessTokenForUser(Guid.NewGuid(), claims);
+        
+        // Act
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminAccessToken);
+        var response = await HttpClient.PostAsync($"api/users/{testUser.Id.Value}/unlock", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
 }

@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleAuthenticationService.Api.Controllers.UserAccounts.Requests;
 using SimpleAuthenticationService.Application.UserAccounts.AddUserAccountClaim;
 using SimpleAuthenticationService.Application.UserAccounts.CreateUserAccount;
+using SimpleAuthenticationService.Application.UserAccounts.DeleteUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetCurrentLoggedInUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccountClaims;
 using SimpleAuthenticationService.Application.UserAccounts.GetUserAccounts;
+using SimpleAuthenticationService.Application.UserAccounts.LockUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.RemoveUserAccountClaim;
+using SimpleAuthenticationService.Application.UserAccounts.UnlockUserAccount;
 using SimpleAuthenticationService.Application.UserAccounts.UpdateCurrentLoggedInUserAccountPassword;
 using SimpleAuthenticationService.Infrastructure.Authorization;
 
@@ -111,6 +114,45 @@ public class UserAccountsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new RemoveUserAccountClaimCommand(id, request.Type, request.Value);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteUserAccount(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteUserAccountCommand(id);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpPost("{id:guid}/lock")]
+    public async Task<IActionResult> LockUserAccount(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new LockUserAccountCommand(id);
+
+        await _sender.Send(command, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [Authorize(Policy = AuthorizationPolicies.UserAccountAdministrator)]
+    [HttpPost("{id:guid}/unlock")]
+    public async Task<IActionResult> UnlockUserAccount(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new UnlockUserAccountCommand(id);
 
         await _sender.Send(command, cancellationToken);
 
